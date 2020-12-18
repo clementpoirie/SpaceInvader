@@ -14,7 +14,7 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 ###################################################################################################################################################
 #                                                      Modules importés
 ###################################################################################################################################################
-from tkinter import Tk, Label, Button, Canvas, PhotoImage
+from tkinter import Tk, Label, Button, Canvas, PhotoImage,ALL
 
 ###################################################################################################################################################
 #                                                          Classes
@@ -22,6 +22,9 @@ from tkinter import Tk, Label, Button, Canvas, PhotoImage
 
 
 class CInterface:
+    def __init__ (self):
+        self.CreerFenetre()
+        self.CreerToile()
     def CreerFenetre(self):
         "Creation de la fenetre"
         self.Fenetre = Tk()
@@ -61,13 +64,15 @@ class CInterface:
 
 class Ennemie:
     def __init__(self, canvas, ennemie):
-        self.Pcanvas = canvas
-        self.Pfilename = PhotoImage(file=ennemie)
-        self.Pimage = self.Pcanvas.create_image(
-            -100, 255, anchor='NW', image=self.Pfilename)
+        self.Pcanvas=Canvas(canvas,height=100,width=100)
+        self.Pfilename = PhotoImage(file="Data/X-wing_2.png")
+        self.X = 1
+        self.Y = 1
+        self.Pimage = self.Pcanvas.create_image(self.X,self.Y, image=self.Pfilename)
+        self.Pcanvas.place(anchor = "nw")
         self.direction = 0
         self.limite = 0
-
+        self.YMAX = 0
     def Mouvement(self):
         #Fonction permmettant le déplacement du vaisseau ennemie
         #Méthode : Si le vaisseau se trouve dans la fenêtre, il se déplace soit à gauche soit à droite suivant la valeur de direction
@@ -75,21 +80,27 @@ class Ennemie:
         #puis on initalise une autre valeur qui servira de limite quant au déplacement du vaisseau vers le bas; cette dernière valeur récupère la coordonnée
         #en Y du vaisseau puis lui rajoute une certaine valeur, par la suit cette valeur sera comparée avec la prochaine coordonnée du vaisseau.
         #Si la différence est égale à 0, on repasse la valeur limite à 0 puis on recommence le déplacement avec la direction changée
-        if self.Pcanvas.Getcoord()[0] > 0 and self.Pcanvas.Getcoord()[0] < 100 and self.limite == 0 : #légerement inférieur a la taille du canavs
-            self.Direction(self.direction)
-        if self.Pcanvas.Getcoord()[0] >= 100 and self.limite == 0:
-            self.direction = 1
-            self.limite = 1
-            YMAX = self.Pcanvas.Getcoord()[1]+20
-        if self.Pcanvas.Getcoord()[0] <= 0 and self.limite == 0:
-            self.direction = 0
-            self.limite = 1
-            YMAX = self.Pcanvas.Getcoord()[1]+20
-        if abs(self.Pcanvas.Getcoord()[1] - YMAX) > 0 and self.limite == 1:
-            self.Pcanvas.move(self.Pimage, 0, 2)
-        if abs(self.Pcanvas.Getcoord()[1] - YMAX) <= 0 and self.limite == 1:
-            self.limite = 0
-
+        if self.Getcoord()[1] < 850 :
+            if self.Getcoord()[0] > 0 and self.Getcoord()[0] < 100 and self.limite == 0 : #légerement inférieur a la taille du canavs
+                self.Direction(self.direction)
+            elif self.Getcoord()[0] >= 100 and self.limite == 0:
+                self.direction = 1
+                self.limite = 1
+                self.X = 99
+                self.YMAX = self.Getcoord()[1]+200
+            elif self.Getcoord()[0] <= 0 and self.limite == 0:
+                self.direction = 0
+                self.limite = 1
+                self.X = 1
+                self.YMAX = self.Getcoord()[1]+20     
+            elif abs(self.Getcoord()[1] - self.YMAX) > 0 and self.limite == 1:
+                print(abs(self.Getcoord()[1] - self.YMAX))
+                self.Pcanvas.move(self.Pimage, 0, 2)
+            elif abs(self.Getcoord()[1] - self.YMAX) <= 0 and self.limite == 1:
+                self.limite = 0
+                self.Direction(self.direction)
+        self.Pcanvas.place(anchor = "nw")        
+        fenetre.Fenetre.after(10,self.Mouvement())
     def Getcoord(self):
         # fonction pour récuperer les coordonnées du Vaisseau
         return self.Pcanvas.coords(self.Pimage)
@@ -105,4 +116,6 @@ class Ennemie:
 
 
 fenetre = CInterface()
+ennemie = Ennemie(fenetre.Toile,1)
+ennemie.Mouvement()
 fenetre.Mainloop()
