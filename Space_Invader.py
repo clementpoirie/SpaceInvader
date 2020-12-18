@@ -27,6 +27,51 @@ class Ennemie :
         self.direction = 0
         self.limite = 0
         
+        
+    def CreerFenetre(self):   
+        "Creation de la fenetre"
+        self.Fenetre = Tk()        
+        self.Fenetre.title("space invader")   
+        self.Fenetre.attributes('-fullscreen' , True)
+
+        self.fullScreenState = False
+        self.Fenetre.bind("<F11>", self.toggleFullScreen)
+        self.Fenetre.bind("<Escape>", self.quitFullScreen)
+        
+      
+        self.FichierGif_Fond = "Data/StarWars.png"  # Le fichier .gif de l'image de fond est dans le répertoire "Gif_Autres", au même niveau que ce programme
+        self.ImageFond = PhotoImage(file=self.FichierGif_Fond)
+        self.LargeurFenetre = self.ImageFond.width()
+        self.HauteurFenetre = self.ImageFond.height()
+        
+    def toggleFullScreen(self, event):
+        self.fullScreenState = not self.fullScreenState
+        self.Fenetre.attributes("-fullscreen", self.fullScreenState)
+
+    def quitFullScreen(self, event):
+        self.fullScreenState = False
+        self.Fenetre.attributes("-fullscreen", self.fullScreenState)
+            
+
+    def CreerToile(self):
+        "Creation de la Toile (Canevas)"
+        self.Toile = Canvas(self.Fenetre, width=self.LargeurFenetre, height=self.HauteurFenetre, background = 'white')
+        self.Toile.grid(row=0, column=0)    
+        self.Toile.delete(ALL)
+        self.Fond = self.Toile.create_image(0,0,image = self.ImageFond,anchor='nw')
+    
+    def Mainloop(self):
+        self.Fenetre.mainloop()
+        
+
+#class Ennemie :
+   # def __init__(self):
+    
+   # def Tirer(self):
+
+
+
+
     def Mouvement(self):
         #Fonction permmettant le déplacement du vaisseau ennemie
         #Méthode : Si le vaisseau se trouve dans la fenêtre, il se déplace soit à gauche soit à droite suivant la valeur de direction
