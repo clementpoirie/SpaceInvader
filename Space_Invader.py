@@ -31,23 +31,26 @@ class Cinterface():
         "Creation de la fenetre"
         self.Fenetre = Tk()        
         self.Fenetre.title("space invader")   
-        self.LargeurEcran = self.Fenetre.winfo_screenwidth()
-        self.HauteurEcran = self.Fenetre.winfo_screenheight()
-        self.FlagEcranPetit = False
+        self.Fenetre.attributes('-fullscreen' , True)
+
+        self.fullScreenState = False
+        self.Fenetre.bind("<F11>", self.toggleFullScreen)
+        self.Fenetre.bind("<Escape>", self.quitFullScreen)
+        
+      
         self.FichierGif_Fond = "Data/StarWars.png"  # Le fichier .gif de l'image de fond est dans le répertoire "Gif_Autres", au même niveau que ce programme
         self.ImageFond = PhotoImage(file=self.FichierGif_Fond)
         self.LargeurFenetre = self.ImageFond.width()
         self.HauteurFenetre = self.ImageFond.height()
         
-        # Si la hauteur de l'image est supérieure à la hauteur de l'écran, réduction de la hauteur de la fenetre à 600 pixels
-        if self.HauteurFenetre + 100 > self.HauteurEcran :
-            self.EcranPetit=True
-            self.HauteurFenetre = 600
-            self.DecalagePixel_y = 25
-        else:
-            self.EcranPetit=False
-            self.HauteurFenetre = self.ImageFond.height()
-            self.DecalagePixel_y = 0
+    def toggleFullScreen(self, event):
+        self.fullScreenState = not self.fullScreenState
+        self.Fenetre.attributes("-fullscreen", self.fullScreenState)
+
+    def quitFullScreen(self, event):
+        self.fullScreenState = False
+        self.Fenetre.attributes("-fullscreen", self.fullScreenState)
+            
 
     def CreerToile(self):
         "Creation de la Toile (Canevas)"
