@@ -22,6 +22,10 @@ from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL
 
 
 class CInterface:
+    def __init__ (self):
+        self.CreerFenetre()
+        self.CreerToile()
+
     def CreerFenetre(self):
         "Creation de la fenetre"
         self.Fenetre = Tk()
@@ -48,8 +52,7 @@ class CInterface:
 
     def CreerToile(self):
         "Creation de la Toile (Canevas)"
-        self.Toile = Canvas(self.Fenetre, width=self.LargeurFenetre,
-                            height=self.HauteurFenetre, background='white')
+        self.Toile = Canvas(self.Fenetre, width=self.LargeurFenetre, height=self.HauteurFenetre, background='white')
         self.Toile.grid(row=0, column=0)
         self.Toile.delete(ALL)
         self.Fond = self.Toile.create_image(
