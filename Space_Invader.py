@@ -34,7 +34,7 @@ class Ennemie :
         #puis on initalise une autre valeur qui servira de limite quant au déplacement du vaisseau vers le bas; cette dernière valeur récupère la coordonnée
         #en Y du vaisseau puis lui rajoute une certaine valeur, par la suit cette valeur sera comparée avec la prochaine coordonnée du vaisseau.
         #Si la différence est égale à 0, on repasse la valeur limite à 0 puis on recommence le déplacement avec la direction changée
-        if self.Pcanvas.Getcoord()[0] > 0 and self.Pcanvas.Getcoord()[0] < 100 and self.limite == 0 "légerement inférieur a la taille du canavs":
+        if self.Pcanvas.Getcoord()[0] > 0 and self.Pcanvas.Getcoord()[0] < 100 and self.limite == 0 #légerement inférieur a la taille du canavs
             Direction(self.direction)
         if self.Pcanvas.Getcoord()[0] >= 100 and self.limite == 0:
             self.direction = 1
