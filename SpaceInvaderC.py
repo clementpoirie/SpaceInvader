@@ -15,6 +15,7 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 #                                                      Modules importés
 ###################################################################################################################################################
 from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL
+from time import sleep
 
 ###################################################################################################################################################
 #                                                          Classes
@@ -25,6 +26,9 @@ class CInterface:
     def __init__ (self):
         self.CreerFenetre()
         self.CreerToile()
+        self.CreerChamps()
+        self.CreerBoutons()
+        
 
     def CreerFenetre(self):
         "Creation de la fenetre"
@@ -32,31 +36,50 @@ class CInterface:
         self.Fenetre.title("space invader")
         self.Fenetre.attributes('-fullscreen', True)
 
-        self.fullScreenState = False
-        self.Fenetre.bind("<F11>", self.toggleFullScreen)
-        self.Fenetre.bind("<Escape>", self.quitFullScreen)
+        self.etatFenetre = False
+        self.Fenetre.bind("<F11>", self.Remise_PleineEcran)
+        self.Fenetre.bind("<Escape>", self.Arreter_PleinEcran)
 
         # Le fichier .gif de l'image de fond est dans le répertoire "Gif_Autres", au même niveau que ce programme
         self.FichierGif_Fond = "Data/StarWars.png"
+        self.FichierPng_Vaisseau = "Data/Chasseur_Tie.png"
+
         self.ImageFond = PhotoImage(file=self.FichierGif_Fond)
+        self.ImageVaisseau = PhotoImage(file=self.FichierPng_Vaisseau)
+
         self.LargeurFenetre = self.ImageFond.width()
         self.HauteurFenetre = self.ImageFond.height()
 
-    def toggleFullScreen(self, event):
-        self.fullScreenState = not self.fullScreenState
-        self.Fenetre.attributes("-fullscreen", self.fullScreenState)
+    def Remise_PleineEcran(self, event):
+        self.etatFenetre = not self.etatFenetre
+        self.Fenetre.attributes("-fullscreen", self.etatFenetre)
 
-    def quitFullScreen(self, event):
-        self.fullScreenState = False
-        self.Fenetre.attributes("-fullscreen", self.fullScreenState)
+    def Arreter_PleinEcran(self, event):
+        self.etatFenetre = False
+        self.Fenetre.attributes("-fullscreen", self.etatFenetre)
 
     def CreerToile(self):
         "Creation de la Toile (Canevas)"
-        self.Toile = Canvas(self.Fenetre, width=self.LargeurFenetre, height=self.HauteurFenetre, background='white')
-        self.Toile.grid(row=0, column=0)
+        self.Toile = Canvas(self.Fenetre, width= 1350, height= 850, background='white')
+        self.Toile.grid(row=1, column=0 , columnspan = 3 , rowspan = 4 )
         self.Toile.delete(ALL)
-        self.Fond = self.Toile.create_image(
-            0, 0, image=self.ImageFond, anchor='nw')
+        self.Fond = self.Toile.create_image(0, 0, image=self.ImageFond, anchor='nw')
+
+
+    def CreerChamps(self):
+        "Creation des champs"
+        self.Score = Label(self.Fenetre, text="Score :" + '100', font='Arial 10', fg='black',anchor='w', borderwidth=0)
+        self.Score.grid(row=0, column=0, sticky='nw')
+
+        self.Vie = Label(self.Fenetre, text="Vie : :" + '3', font='Arial 10', fg='black',anchor='w', borderwidth=0)
+        self.Vie.grid(row=0, column=2, sticky='nw')
+    
+    def CreerBoutons(self):
+        self.Btn_Quitter = Button(self.Fenetre, text ='Quitter', width=15, command=self.Fenetre.destroy)
+        self.Btn_Quitter.grid(row=3, column=4, sticky='e', padx=15)
+
+        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15, command=self.Fenetre.destroy)
+        self.Btn_Recommencer.grid(row=2, column=4, sticky='e', padx=15)
 
     def Mainloop(self):
         self.Fenetre.mainloop()
