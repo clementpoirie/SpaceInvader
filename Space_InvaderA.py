@@ -20,7 +20,6 @@ from time import sleep
 ###################################################################################################################################################
 #                                                          Classes
 ###################################################################################################################################################
-global listeEN
 
 class CInterface:
     def __init__ (self):
@@ -95,7 +94,6 @@ class Ennemie:
         self.limite = 0
         self.YMAX = 0
     def Mouvement(self):
-        print("slt")
         #Fonction permmettant le déplacement du vaisseau ennemie
         #Méthode : Si le vaisseau se trouve dans la fenêtre, il se déplace soit à gauche soit à droite suivant la valeur de direction
         #Ensuite si le vaiseau s'apprête à sortir de l'écran on initialise une valeur limite à 1 pour qu'il ne rentre plus dans le premier if
@@ -103,27 +101,26 @@ class Ennemie:
         #en Y du vaisseau puis lui rajoute une certaine valeur, par la suit cette valeur sera comparée avec la prochaine coordonnée du vaisseau.
         #Si la différence est égale à 0, on repasse la valeur limite à 0 puis on recommence le déplacement avec la direction changée
         if self.Getcoord()[1] < 850 :
-            if self.Getcoord()[0] > 0 and self.Getcoord()[0] < 1000 and self.limite == 0 : #légerement inférieur a la taille du canavs
+            if self.Getcoord()[0] > 5 and self.Getcoord()[0] < 1345 and self.limite == 0 : #légerement inférieur a la taille du canavs
                 self.Direction(self.direction)
-            elif self.Getcoord()[0] >= 1000 and self.limite == 0:
+            elif self.Getcoord()[0] >= 1345 and self.limite == 0:
                 self.direction = 1
                 self.limite = 1
                 self.X = 99
-                self.YMAX = self.Getcoord()[1]+200
-            elif self.Getcoord()[0] <= 0 and self.limite == 0:
+                self.YMAX = self.Getcoord()[1]+20
+            elif self.Getcoord()[0] <= 5 and self.limite == 0:
                 self.direction = 0
                 self.limite = 1
                 self.X = 1
-                self.YMAX = self.Getcoord()[1]+20     
+                self.YMAX = self.Getcoord()[1]+20    
             elif abs(self.Getcoord()[1] - self.YMAX) > 0 and self.limite == 1:
                 print(abs(self.Getcoord()[1] - self.YMAX))
-                self.Pcanvas.move(self.Pimage, 0, 2)
+                self.Pcanvas.move(self.Pimage, 0, 20)
             elif abs(self.Getcoord()[1] - self.YMAX) <= 0 and self.limite == 1:
                 self.limite = 0
                 self.Direction(self.direction)
         else :
-            self.Pcanvas.destroy        
-        self.Pcanvas.place(anchor = "nw")        
+            self.Pimage.destroy             
         fenetre.Fenetre.after(10,self.Mouvement)
     def Getcoord(self):
         # fonction pour récuperer les coordonnées du Vaisseau
@@ -140,20 +137,21 @@ class Ennemie:
 
 
 def creation_ennemie(Toile):
+    global listeEN
     listeEN = []
     for  i in range(10):
         listeEN.append(Ennemie(Toile,1,i)) 
-    fenetre.Fenetre.after(10,a)  
+    fenetre.Fenetre.after(10,a) 
+    return listeEN 
 
-def Debut_Partie(listeEN):
-    print("SLT")
+def Debut_Partie(event):
+    print(len(listeEN))
     for i in range(len(listeEN)):
-        listeEN[i].Mouvement
+        listeEN[i].Mouvement()
 ###################################################################################################################################################
 #                                                            Main
 ###################################################################################################################################################
 
-listeEN = []
 fenetre = CInterface()
-fenetre.Toile.bind('x',Debut_Partie(listeEN))
+fenetre.Fenetre.bind('x',Debut_Partie)
 fenetre.Mainloop()
