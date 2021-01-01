@@ -16,6 +16,7 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 ###################################################################################################################################################
 from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL
 from time import sleep
+from random import randint
 
 ###################################################################################################################################################
 #                                                          Classes
@@ -84,15 +85,16 @@ class CInterface:
         self.Fenetre.mainloop()
 
 class Ennemie:
-    def __init__(self, canvas, ennemie,i):
+    def __init__(self, canvas, ennemie,X,Y):
         self.Pcanvas=canvas
         self.Pfilename = PhotoImage(file="Data/X-wing_2.png")
-        self.X = 150
-        self.Y = 50
-        self.Pimage = self.Pcanvas.create_image(self.X + i*100,self.Y, image=self.Pfilename)
+        self.X = X
+        self.Y = Y
+        self.Pimage = self.Pcanvas.create_image(self.X,self.Y, image=self.Pfilename)
         self.direction = 0
         self.limite = 0
         self.YMAX = 0
+        self.ennemie = ennemie
     def Mouvement(self):
         #Fonction permmettant le déplacement du vaisseau ennemie
         #Méthode : Si le vaisseau se trouve dans la fenêtre, il se déplace soit à gauche soit à droite suivant la valeur de direction
@@ -135,12 +137,19 @@ class Ennemie:
 
 
 
-
 def creation_ennemie(Toile):
     global listeEN
     listeEN = []
-    for  i in range(10):
-        listeEN.append(Ennemie(Toile,1,i)) 
+    X = 25
+    Y = 25
+    for  i in range(25):
+        if X < 1300 :
+            listeEN.append(Ennemie(Toile,1,X,Y))
+            X=X + 100
+        else:
+            Y = Y + 100
+            X = 25
+            listeEN.append(Ennemie(Toile,1,X,Y)) 
     fenetre.Fenetre.after(10,a) 
     return listeEN 
 
