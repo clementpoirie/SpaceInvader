@@ -15,8 +15,7 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 #                                                      Modules importés
 ###################################################################################################################################################
 from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL
-from time import sleep
-from random import randint
+from random import uniform
 
 ###################################################################################################################################################
 #                                                          Classes
@@ -78,7 +77,7 @@ class CInterface:
         self.Btn_Quitter = Button(self.Fenetre, text ='Quitter', width=15, command= self.Fenetre.destroy)
         self.Btn_Quitter.grid(row=3, column=4, sticky='e', padx=15)
 
-        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : creation_ennemie(self.Toile))
+        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : creationEnnemie(self.Toile))
         self.Btn_Recommencer.grid(row=2, column=4, sticky='e', padx=15)
 
     def Mainloop(self):
@@ -104,7 +103,7 @@ class Ennemie:
         #Si la différence est égale à 0, on repasse la valeur limite à 0 puis on recommence le déplacement avec la direction changée
         if self.Getcoord()[1] < 850 :
             if self.Getcoord()[0] > 5 and self.Getcoord()[0] < 1345 and self.limite == 0 : #légerement inférieur a la taille du canavs
-                self.Direction(self.direction)
+                self.Direction()
             elif self.Getcoord()[0] >= 1345 and self.limite == 0:
                 self.direction = 1
                 self.limite = 1
@@ -116,11 +115,10 @@ class Ennemie:
                 self.X = 1
                 self.YMAX = self.Getcoord()[1]+20    
             elif abs(self.Getcoord()[1] - self.YMAX) > 0 and self.limite == 1:
-                print(abs(self.Getcoord()[1] - self.YMAX))
                 self.Pcanvas.move(self.Pimage, 0, 20)
             elif abs(self.Getcoord()[1] - self.YMAX) <= 0 and self.limite == 1:
                 self.limite = 0
-                self.Direction(self.direction)
+                self.Direction()
         else :
             self.Pimage.destroy             
         fenetre.Fenetre.after(10,self.Mouvement)
@@ -128,18 +126,38 @@ class Ennemie:
         # fonction pour récuperer les coordonnées du Vaisseau
         return self.Pcanvas.coords(self.Pimage)
 
-    def Direction(self, sens):
+    def Direction(self):
         if self.direction == 0:
             self.Pcanvas.move(self.Pimage, 10, 0)
         elif self.direction == 1:
             self.Pcanvas.move(self.Pimage, -10, 0)
 
+class Tir():
+    def __init__(self,canvas,Tir,direction,X,Y):
+        self.Pcanvas = canvas
+        self.Pfilename = PhotoImage(file=Tir)
+        self.X = X
+        self.Y = Y
+        self.Pimage = self.Pcanvas.create_image(self.X,self.Y, image=self.Pfilename)
+        self.direction = direction
+    
+    def Direction(self):
+        #Fonction permettant de déplacer le tir vers le haut ou vers le bas suivant qui tir
+        #vers le haut pour le joueur (direction = 0) et vers le bas pour les ennemies (direction = 1)
+        if self.direction == 0 :
+             self.Pcanvas.move(self.Pimage, 0, -10)
+        elif self.direction == 1:
+            self.Pcanvas.move(self.Pimage, 0, 10)
+    def Getcoord(self):
+        # fonction pour récuperer les coordonnées du Tir
+        return self.Pcanvas.coords(self.Pimage)    
 
 
-
-def creation_ennemie(Toile):
+def creationEnnemie(Toile):
     global listeEN
     listeEN = []
+    global listeTir
+    listeTir = []
     X = 25
     Y = 25
     for  i in range(25):
@@ -150,13 +168,31 @@ def creation_ennemie(Toile):
             Y = Y + 100
             X = 25
             listeEN.append(Ennemie(Toile,1,X,Y)) 
-    fenetre.Fenetre.after(10,a) 
     return listeEN 
 
-def Debut_Partie(event):
-    print(len(listeEN))
+
+
+def Partie():
     for i in range(len(listeEN)):
-        listeEN[i].Mouvement()
+        R = uniform(0,100)
+        if R <= 0.05 :
+            coord = listeEN[i].Getcoord()
+            X = coord[0]
+            Y = coord[1]
+            listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,X,Y))
+    if listeTir != []:
+        for i in range(len(listeTir)):
+            listeTir[i].Direction()
+            
+    fenetre.Fenetre.after(10,Partie)              
+
+    
+
+def Debut_Partie(event):
+    for i in range(len(listeEN)):
+        listeEN[i].Mouvement()      
+   
+    fenetre.Fenetre.after(10,Partie)                       
 ###################################################################################################################################################
 #                                                            Main
 ###################################################################################################################################################
