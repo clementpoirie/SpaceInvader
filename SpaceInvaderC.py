@@ -14,7 +14,8 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 ###################################################################################################################################################
 #                                                      Modules importés
 ###################################################################################################################################################
-from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL 
+from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL ,Menu , Toplevel 
+
 from time import sleep
 
 ###################################################################################################################################################
@@ -27,11 +28,8 @@ class CInterface:
         self.CreerToile()
         self.CreerChamps()
         self.CreerBoutons()
-        
-        
-       
-        
-
+        self.createMenuBar()
+             
     def CreerFenetre(self):
         "Creation de la fenetre"
         self.Fenetre = Tk()
@@ -85,9 +83,51 @@ class CInterface:
         self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : nouvelle_partie(self.Toile))
         self.Btn_Recommencer.grid(row=2, column=4, sticky='e', padx=15)
 
-   
+       
+
+    def createMenuBar(self):
+        menuBar = Menu(self.Fenetre )
+        
+        menuFile = Menu(menuBar, tearoff=0 , bg = '#2A2C2B' , fg = 'white' , activebackground='#004c99', activeborderwidth = 0.3)
+        menuFile.add_command(label="Nouvelle partie", command= lambda : nouvelle_partie(self.Toile))
+        menuFile.add_command(label="Aide" , command = genererFenetreAide)
+        menuFile.add_command(label="Difficulté")
+
+        menuFile.add_separator()
+
+        menuFile.add_command(label="Quitter", command= self.Fenetre.destroy)
+        menuBar.add_cascade( label="Menu", menu=menuFile)
+
+        self.Fenetre.config(menu = menuBar) 
+
+
     def Mainloop(self):
         self.Fenetre.mainloop()
+
+
+def genererFenetreAide():
+    fenetreAide = Toplevel()
+    fenetreAide.title("aide")
+
+    label1 = Label(fenetreAide , text ="Les touches :")
+    toucheX = Label(fenetreAide , text ="La touche x permet de démarrer une nouvelle partie")
+    toucheESP = Label(fenetreAide , text ="La touche espace permet de tirer")
+    toucheFleche = Label(fenetreAide , text ="Les touches flèches permettent de se déplacer")
+    label2 = Label(fenetreAide , text ="Le but :")
+    leBut = Label(fenetreAide , text ="Le but du jeu est de tuer tous les vaisseau ennemie sans perdre toutes ses vie")
+    bonJeu = Label(fenetreAide , text ="Amusez-vous bien")
+    boutonQuitter = Button(fenetreAide , text = "quitter", command = fenetreAide.destroy)
+    
+    label1.grid(row = 1 , column = 2 ,  sticky='nesw' )
+    toucheX.grid(row = 2 , column = 1 , columnspan = 3,  sticky='w' )
+    toucheESP.grid(row = 3 , column = 1 , columnspan = 3, sticky='w')
+    toucheFleche.grid(row = 4 , column = 1 , columnspan = 3 , sticky='w')
+    label2.grid(row = 5 , column = 2 ,  sticky='nesw' )
+    leBut.grid(row = 6, column = 1 , columnspan = 3)
+    bonJeu.grid(row = 7 , column = 2 ,  sticky='nesw' )
+
+    boutonQuitter.grid(row=8, column=2, sticky='e', padx=15 , columnspan = 2)
+    
 
 class Ennemie:
     def __init__(self, canvas, ennemie,i):
@@ -148,11 +188,6 @@ class Camis:
         self.vaisseau = Canvas(self.Pcanvas, width = 20 , height = 20 , background = 'white') 
         #self.Fond = self.vaisseau.create_image(0, 0, image=self.ImageFond, anchor='nw')
         self.vaisseau.place(x = 1350 / 2 , y = 850 - 100)  
-
-        self.Pcanvas.bind("<Key-Left>", self.mouvementG)
-        self.Pcanvas.bind("<Key-Right>", self.mouvementD)
-        
-
          
     def mouvementG(self , event ):
         print('gauche')
@@ -163,9 +198,18 @@ class Camis:
         self.Pcanvas.move(self.vaisseau, 10, 0)
        
 
-def mouvementAllié(amis):
-    print('coucou')
-    amis.mouvement()
+#def mouvementAllié(event):
+    #print('coucou')
+    #touche=event.keysym
+    #if touche =='Left':
+       # vaisseau.mouvementG
+        
+    #elif touche =='Right':
+        #vaisseau.mouvementD
+    
+
+  
+
 
 
 def nouvelle_partie (Toile):
@@ -192,4 +236,6 @@ def Debut_Partie(event):
 
 fenetre = CInterface()
 fenetre.Fenetre.bind('x',Debut_Partie)
+#fenetre.Fenetre.bind("<Left>", mouvementAllié)
+#fenetre.Fenetre.bind("<Right>", mouvementAllié)
 fenetre.Mainloop()
