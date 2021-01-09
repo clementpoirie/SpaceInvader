@@ -107,6 +107,7 @@ class CInterface:
 
 def genererFenetreAide():
     fenetreAide = Toplevel()
+    fenetreAide.overrideredirect(1)
     fenetreAide.title("aide")
 
     label1 = Label(fenetreAide , text ="Les touches :")
