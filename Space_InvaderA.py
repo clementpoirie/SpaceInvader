@@ -218,7 +218,6 @@ def Collision(listeTir):
                 
 
 
-
 def Partie():
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
