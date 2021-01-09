@@ -151,7 +151,31 @@ class Tir():
         return self.Pcanvas.coords(self.Pimage)    
 
 
+class Camis:
+    def __init__(self , canvas ):
+        self.Pcanvas=canvas
+        self.Pfilename = PhotoImage(file="Data/X-wing_2.png")
+        self.Pimage = self.Pcanvas.create_image(675,750, image=self.Pfilename)
+        #self.vaisseau = Canvas(self.Pcanvas, width = 20 , height = 20 , background = 'white') 
+        #self.Fond = self.vaisseau.create_image(0, 0, image=self.ImageFond, anchor='nw')
+        #self.vaisseau.place(x = 1350 / 2 , y = 850 - 100)
+    def mouvementG(self,event):
+        self.Pcanvas.move(self.Pimage, -10, 0)
+
+    def mouvementD (self,event):
+        self.Pcanvas.move(self.Pimage, 10, 0)          
+    def Getcoord(self):
+        # fonction pour récuperer les coordonnées du joueur
+        return self.Pcanvas.coords(self.Pimage)    
+    def TirJoueur(self,event):
+        coord = self.Getcoord()
+        Xj = coord[0]
+        Yj = coord[1]
+        listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",0,Xj,Yj))
+
 def creationEnnemie(Toile):
+    global Amis
+    Amis = Camis(Toile)
     global listeEN
     listeEN = []
     global listeTir
@@ -168,8 +192,8 @@ def creationEnnemie(Toile):
             listeEN.append(Ennemie(Toile,1,X,Y)) 
     return listeEN 
 
-def Collision():
-    coord = amis.Getcoord()
+def Collision(listeTir):
+    coord = Amis.Getcoord()
     Xj = coord[0]
     Yj = coord[1]
     for i in range(len(listeTir)):
@@ -184,24 +208,31 @@ def Collision():
                 if abs(Xe - Xt) <= 5 and abs(Ye - Yt) <= 5:
                     del listeEN[i]
                     del listeTir[i]
-        if listeTir[i].direction == 1 : #Si le tir provient d'un ennemie 
+                    break
+        elif listeTir[i].direction == 1 : #Si le tir provient d'un ennemie 
             if  abs(Xj - Xt) <= 5 and abs(Yj - Yt) <= 5:
                 del listeTir
-                vie -= 1         
+                vie -= 1    
+                break 
 
                 
 
 
 
 def Partie():
+    fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
+    fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
+    fenetre.Fenetre.bind('w',Amis.TirJoueur)
+
     for i in range(len(listeEN)):
         R = uniform(0,100)
         if R <= 0.05 :
             coord = listeEN[i].Getcoord()
-            X = coord[0]
-            Y = coord[1]
-            listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,X,Y))
+            Xe = coord[0]
+            Ye = coord[1]
+            listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,Xe,Ye))
     if listeTir != []:
+        Collision(listeTir)
         for i in range(len(listeTir)):
             listeTir[i].Direction()
     fenetre.Fenetre.after(10,Partie)              
@@ -212,11 +243,15 @@ def Debut_Partie(event):
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
-    fenetre.Fenetre.after(10,Partie)                       
+    fenetre.Fenetre.after(10,Partie)    
+
+
+                    
 ###################################################################################################################################################
 #                                                            Main
 ###################################################################################################################################################
 
 fenetre = CInterface()
 fenetre.Fenetre.bind('x',Debut_Partie)
+
 fenetre.Mainloop()
