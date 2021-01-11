@@ -42,11 +42,10 @@ class CInterface:
 
         # Le fichier .gif de l'image de fond est dans le répertoire "Gif_Autres", au même niveau que ce programme
         self.FichierGif_Fond = "Data/StarWars.png"
-        self.FichierPng_Vaisseau = "Data/Chasseur_Tie.png"
+        
 
         self.ImageFond = PhotoImage(file=self.FichierGif_Fond)
-        self.ImageVaisseau = PhotoImage(file=self.FichierPng_Vaisseau)
-
+        
         self.LargeurFenetre = self.ImageFond.width()
         self.HauteurFenetre = self.ImageFond.height()
 
@@ -71,7 +70,7 @@ class CInterface:
         self.Score = Label(self.Fenetre, text="Score :" + '100', font='Arial 10', fg='black',anchor='w', borderwidth=0)
         self.Score.grid(row=0, column=0, sticky='nw')
 
-        self.Vie = Label(self.Fenetre, text="Vie : :" + '3', font='Arial 10', fg='black',anchor='w', borderwidth=0)
+        self.Vie = Label(self.Fenetre, text="Vie : " + '3', font='Arial 10', fg='black',anchor='w', borderwidth=0)
         self.Vie.grid(row=0, column=2, sticky='nw')
     
     def CreerBoutons(self):
