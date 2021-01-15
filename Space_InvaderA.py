@@ -222,7 +222,6 @@ def Collision(listeTir):
     for Ennemie in indiceEnnemie :
         listeEN.remove(Ennemie)
 
-
 def Partie():
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
