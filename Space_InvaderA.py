@@ -23,13 +23,15 @@ from tkinter import  PhotoImage , ALL ,Menu , Toplevel , DISABLED
 ###################################################################################################################################################
 
 class CInterface:
-    def __init__ (self):
+    def __init__ (self,vie,score):
+        self.vie = str(vie)
+        self.score = str(score)
         self.CreerFenetre()
         self.CreerToile()
-        self.CreerChamps()
+        self.CreerChamps(self.vie,self.score)
         self.CreerBoutons()
         self.createMenuBar()
-
+        
     def CreerFenetre(self):
         "Creation de la fenetre"
         self.Fenetre = Tk()
@@ -66,12 +68,12 @@ class CInterface:
         self.Fond = self.Toile.create_image(0, 0, image=self.ImageFond, anchor='nw')
 
 
-    def CreerChamps(self):
+    def CreerChamps(self,vie,score):
         "Creation des champs"
-        self.Score = Label(self.Fenetre, text="Score :" + '100', font='Arial 10', fg='black',anchor='w', borderwidth=0)
+        self.Score = Label(self.Fenetre, text="Score :" + score, font='Arial 10', fg='black',anchor='w', borderwidth=0)
         self.Score.grid(row=0, column=0, sticky='nw')
 
-        self.Vie = Label(self.Fenetre, text="Vie : :" + '3', font='Arial 10', fg='black',anchor='w', borderwidth=0)
+        self.Vie = Label(self.Fenetre, text="Vie : :" + vie, font='Arial 10', fg='black',anchor='w', borderwidth=0)
         self.Vie.grid(row=0, column=2, sticky='nw')
     
     def CreerBoutons(self):
@@ -96,6 +98,8 @@ class CInterface:
         self.Fenetre.config(menu = menuBar) 
     def Mainloop(self):
         self.Fenetre.mainloop()
+    def actu(self):
+        self.Toile.update()
 
 class Ennemie:
     def __init__(self, canvas, ennemie,X,Y):
@@ -308,7 +312,8 @@ def Collision(listeTir,vie,score):
         for Ennemie in indiceEnnemie :      
             if Ennemie in listeEN:
                 listeEN.remove(Ennemie) 
-    return vie
+    fenetre.CreerChamps(str(vie),str(score))
+    return vie,score
 def Partie(vie,score):
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
@@ -325,7 +330,7 @@ def Partie(vie,score):
             Ye = coord[1]
             listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,Xe,Ye))
     if listeTir != []:
-        vie = Collision(listeTir,vie,score)
+        vie,score = Collision(listeTir,vie,score)
         for i in range(len(listeTir)):
             listeTir[i].Direction()
     fenetre.Fenetre.after(10,lambda : Partie(vie,score)) 
@@ -334,7 +339,6 @@ def Partie(vie,score):
 
 def Debut_Partie(event):
     vie = 3
-    score = 0
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
@@ -345,7 +349,9 @@ def Debut_Partie(event):
 ###################################################################################################################################################
 #                                                            Main
 ###################################################################################################################################################
-fenetre = CInterface()
-fenetre.Fenetre.bind('x',Debut_Partie)
+vie = 3
+score = 0
+fenetre = CInterface(vie,score)
+fenetre.Fenetre.bind('x',lambda : Debut_Partie)
 
 fenetre.Mainloop()
