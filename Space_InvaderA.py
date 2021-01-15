@@ -352,6 +352,6 @@ def Debut_Partie(event):
 vie = 3
 score = 0
 fenetre = CInterface(vie,score)
-fenetre.Fenetre.bind('x',lambda : Debut_Partie)
+fenetre.Fenetre.bind('x',Debut_Partie)
 
 fenetre.Mainloop()

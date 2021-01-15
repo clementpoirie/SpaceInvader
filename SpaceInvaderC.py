@@ -303,13 +303,13 @@ def VictoireDefaite(vie , condition):
             condition = 1
             vc.append(0)
             vc.append(condition)
-            return vc
+            genererFenetreRecommencer(True)
         elif listeEN == [] :
             print("Victoire") 
             condition = 1
             vc.append(0)
             vc.append(condition)
-            return vc
+            genererFenetreRecommencer(False)
         else:
             vc.append(1)
             vc.append(condition)
@@ -366,7 +366,7 @@ def Partie(vie , condition):
         for i in range(len(listeEN)):
             listeEN[i].actu()  
             R = uniform(0,100)
-            if R <= 5 :
+            if R <= 0.05 :
                 coord = listeEN[i].Getcoord()
                 Xe = coord[0]
                 Ye = coord[1]

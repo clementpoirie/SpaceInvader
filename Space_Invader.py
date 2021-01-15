@@ -96,6 +96,7 @@ class CInterface:
         menuBar.add_cascade( label="Menu", menu=menuFile)
 
         self.Fenetre.config(menu = menuBar) 
+    
     def Mainloop(self):
         self.Fenetre.mainloop()
     def actu(self):
@@ -239,8 +240,27 @@ def genererFenetreDifficulte():
     boutonNiv5.place(x = 350 , y = 250)
     boutonQuitter.place(x = 25 , y = 350 , width = 450)
 
+def genererFenetreRecommencer(defaite):
+    fenetreRecommencer = Toplevel()
+    fenetreRecommencer.overrideredirect(1)
+    fenetreRecommencer.title("Recommencer")
+    fenetreRecommencer.geometry("500x500+500+200")
+       
+    if defaite == True :
+        etatFinJeu = Label(fenetreRecommencer , text = 'DEFAITE' , font=("Courier", 40)  )   
+    else:
+        etatFinJeu = Label(fenetreRecommencer , text = 'VICTOIRE' , font=("Courier", 40)  )
+
+    boutonQuitter = Button(fenetreRecommencer , text = "Quitter", command = fenetreRecommencer.destroy)
+    boutonRejouer = Button(fenetreRecommencer , text = "Recommencer", command = lambda : [creationEnnemie(fenetre.Toile,1), fenetreRecommencer.destroy()])
+    boutonNiveau = Button(fenetreRecommencer , text = "Choix du niveau", command = genererFenetreDifficulte)
+    etatFinJeu.place(x = 115 , y = 110 )
+    boutonRejouer.place(x = 50 , y = 350)
+    boutonNiveau.place (x = 200 , y = 350)
+    boutonQuitter.place(x = 350 , y = 350 , width = 100 )
 
 def creationEnnemie(Toile,niveau):
+   
     global Amis
     Amis = Camis(Toile)
     global listeEN
@@ -272,11 +292,26 @@ def Niveau(niveau):
     if niveau == 5 :
         return 35,0.25
 
-def VictoireDefaite(vie):
-    if vie == 0 :
-        print("Défaite")
-    elif listeEN == [] :
-        print("Victoire") 
+def VictoireDefaite(vie , condition):
+    vc = []
+    if condition ==0:
+
+        if vie == 0 :
+            
+            condition = 1
+            vc.append(0)
+            vc.append(condition)
+            genererFenetreRecommencer(True)
+        elif listeEN == [] :
+            
+            condition = 1
+            vc.append(0)
+            vc.append(condition)
+            genererFenetreRecommencer(False)
+        else:
+            vc.append(1)
+            vc.append(condition)
+            return vc
 
 
 def Collision(listeTir,vie,score):
@@ -314,35 +349,44 @@ def Collision(listeTir,vie,score):
                 listeEN.remove(Ennemie) 
     fenetre.CreerChamps(str(vie),str(score))
     return vie,score
-def Partie(vie,score):
-    fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
-    fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
-    fenetre.Fenetre.bind('w',Amis.TirJoueur)
+
+def Partie(vie,score,condition):
+    var = VictoireDefaite(vie , condition)
+    victoiredefaite = 1
+    victoiredefaite = var[0]
+    condition = var[1]
+    if victoiredefaite == 1:
+
+        fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
+        fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
+        fenetre.Fenetre.bind('w',Amis.TirJoueur)
 
 
 
-    for i in range(len(listeEN)):
-        listeEN[i].actu()  
-        R = uniform(0,100)
-        if R <= ChanceTir :
-            coord = listeEN[i].Getcoord()
-            Xe = coord[0]
-            Ye = coord[1]
-            listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,Xe,Ye))
-    if listeTir != []:
-        vie,score = Collision(listeTir,vie,score)
-        for i in range(len(listeTir)):
-            listeTir[i].Direction()
-    fenetre.Fenetre.after(10,lambda : Partie(vie,score)) 
-    VictoireDefaite(vie)
-
+        for i in range(len(listeEN)):
+            listeEN[i].actu()  
+            R = uniform(0,100)
+            if R <= ChanceTir :
+                coord = listeEN[i].Getcoord()
+                Xe = coord[0]
+                Ye = coord[1]
+                listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,Xe,Ye))
+        if listeTir != []:
+            vie,score = Collision(listeTir,vie,score)
+            for i in range(len(listeTir)):
+                listeTir[i].Direction()
+    fenetre.Fenetre.after(10,lambda : Partie(vie,score,condition)) 
+    VictoireDefaite(vie ,condition)
+    
 
 def Debut_Partie(event):
-    vie = 3
+    fenetre.Btn_Recommencer.config(state = DISABLED)
+    vie = 3   
+    condition =0 
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
-    fenetre.Fenetre.after(10,lambda : Partie(vie,score))    
+    fenetre.Fenetre.after(10,lambda : Partie(vie,score,condition))    
 
 
                     
