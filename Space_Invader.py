@@ -14,8 +14,8 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 ###################################################################################################################################################
 #                                                      Modules importés
 ###################################################################################################################################################
-from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL
 from random import uniform
+from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL
 from tkinter import  PhotoImage , ALL ,Menu , Toplevel , DISABLED
 
 ###################################################################################################################################################
