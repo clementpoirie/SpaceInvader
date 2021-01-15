@@ -286,11 +286,11 @@ def Niveau(niveau):
     if niveau == 2 :
         return 20,0.1
     if niveau == 3 :
-        return 25,0.15
+        return 25,0.5
     if niveau == 4 :
-        return 30,0.2
+        return 30,1
     if niveau == 5 :
-        return 35,0.25
+        return 35,1.5
 
 def VictoireDefaite(vie , condition):
     vc = []
