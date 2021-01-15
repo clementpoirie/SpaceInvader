@@ -183,8 +183,7 @@ def creationEnnemie(Toile):
     listeEN = []
     global listeTir
     listeTir = []
-    global vie
-    vie = 3
+
     X = 25
     Y = 25
     for  i in range(25):
@@ -196,14 +195,20 @@ def creationEnnemie(Toile):
             X = 25
             listeEN.append(Ennemie(Toile,1,X,Y)) 
      
+def VictoireDefaite(vie):
+    if vie == 0 :
+        print("Défaite")
+    elif listeEN == [] :
+        print("Victoire") 
 
-def Collision(listeTir):
+
+def Collision(listeTir,vie):
     coord = Amis.Getcoord()
     Xj = coord[0]
     Yj = coord[1]
     indiceTir = []
     indiceEnnemie = []
-    print(listeTir)
+    print(vie)
     for i in range(len(listeTir)):
         coord = listeTir[i].Getcoord()
         Xt = coord[0]
@@ -230,38 +235,38 @@ def Collision(listeTir):
         for Ennemie in indiceEnnemie :      
             if Ennemie in listeEN:
                 listeEN.remove(Ennemie) 
-
-def Partie():
+    return vie
+def Partie(vie):
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
     fenetre.Fenetre.bind('w',Amis.TirJoueur)
+
+
+
     for i in range(len(listeEN)):
         listeEN[i].actu()  
         R = uniform(0,100)
-        if R <= 0.00000005 :
+        if R <= 0.05 :
             coord = listeEN[i].Getcoord()
             Xe = coord[0]
             Ye = coord[1]
             listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,Xe,Ye))
     if listeTir != []:
-        Collision(listeTir)
+        vie = Collision(listeTir,vie)
         for i in range(len(listeTir)):
             listeTir[i].Direction()
-    fenetre.Fenetre.after(10,Partie) 
-    VictoireDefaite()
+    fenetre.Fenetre.after(10,lambda : Partie(vie)) 
+    VictoireDefaite(vie)
 
 
 def Debut_Partie(event):
+    vie = 3
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
-    fenetre.Fenetre.after(10,Partie)    
+    fenetre.Fenetre.after(10,lambda : Partie(vie))    
 
-def VictoireDefaite():
-    if vie == 0 :
-        print("Défaite")
-    elif listeEN == [] :
-        print("Victoire") 
+
                     
 ###################################################################################################################################################
 #                                                            Main
