@@ -14,9 +14,10 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 ###################################################################################################################################################
 #                                                      Modules importés
 ###################################################################################################################################################
-from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL ,Menu , Toplevel 
 from random import uniform
-from time import sleep
+from tkinter import Tk, Label, Button, Canvas
+from tkinter import  PhotoImage , ALL ,Menu , Toplevel , DISABLED
+
 
 ###################################################################################################################################################
 #                                                          Classes
@@ -68,24 +69,24 @@ class CInterface:
 
     def CreerChamps(self):
         "Creation des champs"
-        self.Score = Label(self.Fenetre, text="Score :" + '100', font='Arial 10', fg='black',anchor='w', borderwidth=0)
+        self.Score = Label(self.Fenetre, text="Score :" + '100', font='Arial 10', fg='black',anchor='w', borderwidth=0 , padx = 20)
         self.Score.grid(row=0, column=0, sticky='nw')
 
-        self.Vie = Label(self.Fenetre, text="Vie : :" + '3', font='Arial 10', fg='black',anchor='w', borderwidth=0)
+        self.Vie = Label(self.Fenetre, text="Vie : " + '3', font='Arial 10', fg='black',anchor='w', borderwidth=0)
         self.Vie.grid(row=0, column=2, sticky='nw')
     
     def CreerBoutons(self):
-        self.Btn_Quitter = Button(self.Fenetre, text ='Quitter', width=15, command= self.Fenetre.destroy)
+        self.Btn_Quitter = Button(self.Fenetre, text ='Quitter', width=15, command= genererFenetreRecommencer)#self.Fenetre.destroy)
         self.Btn_Quitter.grid(row=3, column=4, sticky='e', padx=15)
 
-        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : creationEnnemie(self.Toile))
+        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : creationEnnemie(self.Toile, self.Btn_Recommencer))
         self.Btn_Recommencer.grid(row=2, column=4, sticky='e', padx=15)
 
     def createMenuBar(self):
         menuBar = Menu(self.Fenetre )
         
         menuFile = Menu(menuBar, tearoff=0 , bg = '#2A2C2B' , fg = 'white' , activebackground='#004c99', activeborderwidth = 0.3)
-        menuFile.add_command(label="Nouvelle partie", command= lambda : creationEnnemie(self.Toile))
+        menuFile.add_command(label="Nouvelle partie", command= lambda : creationEnnemie(self.Toile , self.Btn_Recommencer ))
         menuFile.add_command(label="Aide" , command = genererFenetreAide)
         menuFile.add_command(label="Difficulté" , command = genererFenetreDifficulte)
 
@@ -189,7 +190,13 @@ class Camis:
         Yj = coord[1]
         listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",0,Xj,Yj))
 
-def creationEnnemie(Toile):
+
+###################################################################################################################################################
+#                                                          FONCTIONS
+###################################################################################################################################################
+
+def creationEnnemie(Toile , Bouton ):
+    Bouton.config(state = DISABLED)
     global Amis
     Amis = Camis(Toile)
     global listeEN
@@ -231,57 +238,73 @@ def Collision(listeTir):
                 vie -= 1    
                 break 
 
-                
+
+
+def genererFenetreRecommencer():
+    fenetreRecommencer = Toplevel()
+    fenetreRecommencer.overrideredirect(1)
+    fenetreRecommencer.title("Recommencer")
+    fenetreRecommencer.geometry("500x500+500+200")
+       
+      
+    
+    etatFinJeu = Label(fenetreRecommencer , text = 'VICTOIRE' , font=("Courier", 40)  )    
+    boutonQuitter = Button(fenetreRecommencer , text = "Quitter", command = fenetreRecommencer.destroy)
+    boutonRejouer = Button(fenetreRecommencer , text = "Recommencer", command = fenetreRecommencer.destroy)
+    boutonNiveau = Button(fenetreRecommencer , text = "Choix du niveau", command = genererFenetreDifficulte)
+    etatFinJeu.place(x = 115 , y = 110 )
+    boutonRejouer.place(x = 50 , y = 350)
+    boutonNiveau.place (x = 200 , y = 350)
+    boutonQuitter.place(x = 350 , y = 350 , width = 100 )
+
+
 def genererFenetreAide():
     fenetreAide = Toplevel()
     fenetreAide.overrideredirect(1)
     fenetreAide.title("aide")
-    fenetreAide.geometry('500x300+500+300')
+    fenetreAide.geometry('500x500+500+200')
 
-    label1 = Label(fenetreAide , text ="Les touches :")
+    label1 = Label(fenetreAide , text ="Les touches :" , font=("Courier", 15))
     toucheX = Label(fenetreAide , text ="La touche x permet de démarrer une nouvelle partie")
     toucheESP = Label(fenetreAide , text ="La touche espace permet de tirer")
     toucheFleche = Label(fenetreAide , text ="Les touches flèches permettent de se déplacer")
-    label2 = Label(fenetreAide , text ="Le but :")
+    label2 = Label(fenetreAide , text ="Le but :" , font=("Courier", 15))
     leBut = Label(fenetreAide , text ="Le but du jeu est de tuer tous les vaisseaux ennemies sans perdre toutes ses vies")
-    bonJeu = Label(fenetreAide , text ="Amusez-vous bien")
+    bonJeu = Label(fenetreAide , text ="Amusez-vous bien" , font=("Courier", 15))
     boutonQuitter = Button(fenetreAide , text = "quitter", command = fenetreAide.destroy)
     
-    label1.grid(row = 1 , column = 2 ,  sticky='nesw',padx = 30 , pady = 10 )
-    toucheX.grid(row = 2 , column = 1 , columnspan = 3,  sticky='w',padx = 30 , pady = 5 )
-    toucheESP.grid(row = 3 , column = 1 , columnspan = 3, sticky='w' ,padx = 30 , pady = 5)
-    toucheFleche.grid(row = 4 , column = 1 , columnspan = 3 , sticky='w', padx = 30 , pady = 5)
-    label2.grid(row = 5 , column = 2 ,  sticky='nesw' ,padx = 30 , pady = 10 )
-    leBut.grid(row = 6, column = 1 , columnspan = 3 ,padx = 30 , pady = 5)
-    bonJeu.grid(row = 7 , column = 2 ,  sticky='nesw' ,padx = 30 , pady = 10 )
+    label1.place(x = 25 , y = 50)
+    toucheX.place(x = 25 , y = 75 )
+    toucheESP.place(x = 25 , y = 100)
+    toucheFleche.place(x = 25 , y = 125)
+    label2.place(x = 25 , y = 200 )
+    leBut.place(x = 25 , y = 225)
+    bonJeu.place(x = 150 , y = 285)
 
-    boutonQuitter.grid(row=8, column=2, sticky='e', padx=15 , columnspan = 2)
+    boutonQuitter.place(x = 25 , y = 350 , width = 450)
 
 def genererFenetreDifficulte():
     fenetreDifficulte = Toplevel()
     fenetreDifficulte.overrideredirect(1)
     fenetreDifficulte.title("Difficulté")
-    fenetreDifficulte.geometry('400x200+500+300')
+    fenetreDifficulte.geometry('500x500+500+200')
     
-
-    labelTitre = Label(fenetreDifficulte , text = "choisissez le niveau de difficulté :" , font=("Courier", 10) ,  padx = 30 , pady = 15)
+    labelTitre = Label(fenetreDifficulte , text = "choisissez le niveau de difficulté :" , font=("Courier", 13) ,  padx = 30 , pady = 15)
     
-
     boutonNiv1 = Button(fenetreDifficulte , text = "Facile", bg = 'blue', fg = 'white', command = fenetreDifficulte.destroy)
     boutonNiv2 = Button(fenetreDifficulte , text = "moyen", bg = 'green' ,fg = 'white', command = fenetreDifficulte.destroy)
     boutonNiv3 = Button(fenetreDifficulte , text = "difficile", bg = 'red' ,fg = 'white', command = fenetreDifficulte.destroy)
     boutonNiv4 = Button(fenetreDifficulte , text = "mortel", bg = 'purple' ,fg = 'white',command = fenetreDifficulte.destroy)
     boutonNiv5 = Button(fenetreDifficulte , text = "hardcore",bg = 'black' ,fg = 'white', command = fenetreDifficulte.destroy)
-
     boutonQuitter = Button(fenetreDifficulte , text = "quitter", command = fenetreDifficulte.destroy)
     
-    labelTitre.grid(row = 1 , column = 2 , columnspan = 5 , sticky='nesw')
-    boutonNiv1.grid(row = 2 , column = 1 , padx = 10 , pady = 30)
-    boutonNiv2.grid(row = 2 , column = 2 , padx = 10 , pady = 30)
-    boutonNiv3.grid(row = 2 , column = 3 , padx = 10, pady = 30)
-    boutonNiv4.grid(row = 2 , column = 4, padx = 10 , pady = 30)
-    boutonNiv5.grid(row = 2 , column = 5, padx = 10 , pady = 30)
-    boutonQuitter.grid(row=3, column=3 , columnspan = 2, sticky='nesw' , pady = 30)
+    labelTitre.place(x = 25 , y = 150)
+    boutonNiv1.place(x = 50 , y = 250)
+    boutonNiv2.place(x = 125 , y = 250)
+    boutonNiv3.place(x = 200 , y = 250)
+    boutonNiv4.place(x = 275 , y = 250)
+    boutonNiv5.place(x = 350 , y = 250)
+    boutonQuitter.place(x = 25 , y = 350 , width = 450)
 
 
 def Partie():

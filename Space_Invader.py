@@ -16,7 +16,6 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 ###################################################################################################################################################
 from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL ,Menu , Toplevel 
 from random import uniform
-from time import sleep
 
 ###################################################################################################################################################
 #                                                          Classes
