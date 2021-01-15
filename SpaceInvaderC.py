@@ -224,6 +224,7 @@ def Collision(listeTir):
     Yj = coord[1]
     indiceTir = []
     indiceEnnemie = []
+    print(listeTir)
     for i in range(len(listeTir)):
         coord = listeTir[i].Getcoord()
         Xt = coord[0]
@@ -240,12 +241,16 @@ def Collision(listeTir):
             if  abs(Xj - Xt) <= 25 and abs(Yj - Yt) <= 25:
                 vie -=1
                 indiceTir.append(listeTir[i])
-    for Tir in indiceTir :
-        listeTir.remove(Tir)        
-    for Ennemie in indiceEnnemie :
-        listeEN.remove(Ennemie)
-    for i in range(len(listeEN)):
-        listeEN[i].actu()   
+        if Yt < 0 or Yt > 1350 :
+            indiceTir.append(listeTir[i])
+    if indiceTir != []:
+        for Tir in indiceTir :
+            if Tir in listeTir:          
+                listeTir.remove(Tir)  
+    if indiceEnnemie != []:
+        for Ennemie in indiceEnnemie :      
+            if Ennemie in listeEN:
+                listeEN.remove(Ennemie) 
 
 
 def genererFenetreRecommencer(defaite):
@@ -335,13 +340,11 @@ def Partie():
             listeTir[i].Direction()
     fenetre.Fenetre.after(10,Partie) 
 
-
 def Debut_Partie(event):
-    vie = 3
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
-    fenetre.Fenetre.after(10,Partie)     
+    fenetre.Fenetre.after(10,Partie)      
 
 def VictoireDefaite():
    if vie == 0 :
@@ -351,7 +354,6 @@ def VictoireDefaite():
         defaite = False
         genererFenetreRecommencer(defaite)
           
-
 
                     
 ###################################################################################################################################################
