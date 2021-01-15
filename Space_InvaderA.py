@@ -16,6 +16,7 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 ###################################################################################################################################################
 from tkinter import Tk, Label, Button, Canvas, PhotoImage , ALL
 from random import uniform
+from tkinter import  PhotoImage , ALL ,Menu , Toplevel , DISABLED
 
 ###################################################################################################################################################
 #                                                          Classes
@@ -27,7 +28,7 @@ class CInterface:
         self.CreerToile()
         self.CreerChamps()
         self.CreerBoutons()
-        
+        self.createMenuBar()
 
     def CreerFenetre(self):
         "Creation de la fenetre"
@@ -77,9 +78,22 @@ class CInterface:
         self.Btn_Quitter = Button(self.Fenetre, text ='Quitter', width=15, command= self.Fenetre.destroy)
         self.Btn_Quitter.grid(row=3, column=4, sticky='e', padx=15)
 
-        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : creationEnnemie(self.Toile))
+        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : creationEnnemie(self.Toile,1))
         self.Btn_Recommencer.grid(row=2, column=4, sticky='e', padx=15)
+    def createMenuBar(self):
+        menuBar = Menu(self.Fenetre )
+        
+        menuFile = Menu(menuBar, tearoff=0 , bg = '#2A2C2B' , fg = 'white' , activebackground='#004c99', activeborderwidth = 0.3)
+        menuFile.add_command(label="Nouvelle partie", command= lambda : creationEnnemie(self.Toile , self.Btn_Recommencer ))
+        menuFile.add_command(label="Aide" , command = genererFenetreAide)
+        menuFile.add_command(label="Difficulté" , command = genererFenetreDifficulte)
 
+        menuFile.add_separator()
+
+        menuFile.add_command(label="Quitter", command= self.Fenetre.destroy)
+        menuBar.add_cascade( label="Menu", menu=menuFile)
+
+        self.Fenetre.config(menu = menuBar) 
     def Mainloop(self):
         self.Fenetre.mainloop()
 
@@ -158,9 +172,6 @@ class Camis:
         self.Pcanvas=canvas
         self.Pfilename = PhotoImage(file="Data/X-wing_2.png")
         self.Pimage = self.Pcanvas.create_image(675,750, image=self.Pfilename)
-        #self.vaisseau = Canvas(self.Pcanvas, width = 20 , height = 20 , background = 'white') 
-        #self.Fond = self.vaisseau.create_image(0, 0, image=self.ImageFond, anchor='nw')
-        #self.vaisseau.place(x = 1350 / 2 , y = 850 - 100)
     def mouvementG(self,event):
         self.Pcanvas.move(self.Pimage, -10, 0)
 
@@ -176,17 +187,67 @@ class Camis:
         Yj = coord[1]
         listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",0,Xj,Yj))
 
-def creationEnnemie(Toile):
+def genererFenetreAide():
+    fenetreAide = Toplevel()
+    fenetreAide.overrideredirect(1)
+    fenetreAide.title("aide")
+    fenetreAide.geometry('500x500+500+200')
+
+    label1 = Label(fenetreAide , text ="Les touches :" , font=("Courier", 15))
+    toucheX = Label(fenetreAide , text ="La touche x permet de lancer la partie")
+    toucheESP = Label(fenetreAide , text ="La touche espace permet de tirer")
+    toucheFleche = Label(fenetreAide , text ="Les touches flèches permettent de se déplacer")
+    label2 = Label(fenetreAide , text ="Le but :" , font=("Courier", 15))
+    leBut = Label(fenetreAide , text ="Le but du jeu est de tuer tous les vaisseaux ennemies sans perdre toutes ses vies")
+    bonJeu = Label(fenetreAide , text ="Amusez-vous bien" , font=("Courier", 15))
+    boutonQuitter = Button(fenetreAide , text = "quitter", command = fenetreAide.destroy)
+    
+    label1.place(x = 25 , y = 50)
+    toucheX.place(x = 25 , y = 75 )
+    toucheESP.place(x = 25 , y = 100)
+    toucheFleche.place(x = 25 , y = 125)
+    label2.place(x = 25 , y = 200 )
+    leBut.place(x = 25 , y = 225)
+    bonJeu.place(x = 150 , y = 285)
+
+    boutonQuitter.place(x = 25 , y = 350 , width = 450)
+
+def genererFenetreDifficulte():
+    fenetreDifficulte = Toplevel()
+    fenetreDifficulte.overrideredirect(1)
+    fenetreDifficulte.title("Difficulté")
+    fenetreDifficulte.geometry('500x500+500+200')
+    
+    labelTitre = Label(fenetreDifficulte , text = "choisissez le niveau de difficulté :" , font=("Courier", 13) ,  padx = 30 , pady = 15)
+    
+    boutonNiv1 = Button(fenetreDifficulte , text = "Facile", bg = 'blue', fg = 'white', command = lambda : creationEnnemie(fenetre.Toile,1))
+    boutonNiv2 = Button(fenetreDifficulte , text = "moyen", bg = 'green' ,fg = 'white', command = lambda : creationEnnemie(fenetre.Toile,2))
+    boutonNiv3 = Button(fenetreDifficulte , text = "difficile", bg = 'red' ,fg = 'white', command = lambda : creationEnnemie(fenetre.Toile,3))
+    boutonNiv4 = Button(fenetreDifficulte , text = "mortel", bg = 'purple' ,fg = 'white',command = lambda : creationEnnemie(fenetre.Toile,4))
+    boutonNiv5 = Button(fenetreDifficulte , text = "hardcore",bg = 'black' ,fg = 'white', command = lambda : creationEnnemie(fenetre.Toile,5))
+    boutonQuitter = Button(fenetreDifficulte , text = "quitter", command = fenetreDifficulte.destroy)
+    
+    labelTitre.place(x = 25 , y = 150)
+    boutonNiv1.place(x = 50 , y = 250)
+    boutonNiv2.place(x = 125 , y = 250)
+    boutonNiv3.place(x = 200 , y = 250)
+    boutonNiv4.place(x = 275 , y = 250)
+    boutonNiv5.place(x = 350 , y = 250)
+    boutonQuitter.place(x = 25 , y = 350 , width = 450)
+
+
+def creationEnnemie(Toile,niveau):
     global Amis
     Amis = Camis(Toile)
     global listeEN
     listeEN = []
     global listeTir
     listeTir = []
-
+    global ChanceTir
+    NbrEnnemies,ChanceTir = Niveau(niveau)
     X = 25
     Y = 25
-    for  i in range(25):
+    for  i in range(NbrEnnemies):
         if X < 1300 :
             listeEN.append(Ennemie(Toile,1,X,Y))
             X=X + 100
@@ -194,7 +255,19 @@ def creationEnnemie(Toile):
             Y = Y + 100
             X = 25
             listeEN.append(Ennemie(Toile,1,X,Y)) 
-     
+
+def Niveau(niveau):
+    if niveau == 1 :
+        return 15,0.05
+    if niveau == 2 :
+        return 20,0.1
+    if niveau == 3 :
+        return 25,0.15
+    if niveau == 4 :
+        return 30,0.2
+    if niveau == 5 :
+        return 35,0.25
+
 def VictoireDefaite(vie):
     if vie == 0 :
         print("Défaite")
@@ -202,13 +275,12 @@ def VictoireDefaite(vie):
         print("Victoire") 
 
 
-def Collision(listeTir,vie):
+def Collision(listeTir,vie,score):
     coord = Amis.Getcoord()
     Xj = coord[0]
     Yj = coord[1]
     indiceTir = []
     indiceEnnemie = []
-    print(vie)
     for i in range(len(listeTir)):
         coord = listeTir[i].Getcoord()
         Xt = coord[0]
@@ -219,6 +291,7 @@ def Collision(listeTir,vie):
                 Xe = coord[0]
                 Ye = coord[1]
                 if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25:
+                    score += 10
                     indiceEnnemie.append(listeEN[t])
                     indiceTir.append(listeTir[i])
         elif listeTir[i].direction == 1 : #Si le tir provient d'un ennemie 
@@ -236,7 +309,7 @@ def Collision(listeTir,vie):
             if Ennemie in listeEN:
                 listeEN.remove(Ennemie) 
     return vie
-def Partie(vie):
+def Partie(vie,score):
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
     fenetre.Fenetre.bind('w',Amis.TirJoueur)
@@ -246,25 +319,26 @@ def Partie(vie):
     for i in range(len(listeEN)):
         listeEN[i].actu()  
         R = uniform(0,100)
-        if R <= 0.05 :
+        if R <= ChanceTir :
             coord = listeEN[i].Getcoord()
             Xe = coord[0]
             Ye = coord[1]
             listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,Xe,Ye))
     if listeTir != []:
-        vie = Collision(listeTir,vie)
+        vie = Collision(listeTir,vie,score)
         for i in range(len(listeTir)):
             listeTir[i].Direction()
-    fenetre.Fenetre.after(10,lambda : Partie(vie)) 
+    fenetre.Fenetre.after(10,lambda : Partie(vie,score)) 
     VictoireDefaite(vie)
 
 
 def Debut_Partie(event):
     vie = 3
+    score = 0
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
-    fenetre.Fenetre.after(10,lambda : Partie(vie))    
+    fenetre.Fenetre.after(10,lambda : Partie(vie,score))    
 
 
                     
