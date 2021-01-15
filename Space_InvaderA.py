@@ -196,34 +196,37 @@ def Collision(listeTir):
     coord = Amis.Getcoord()
     Xj = coord[0]
     Yj = coord[1]
+    indiceTir = []
+    indiceEnnemie = []
     for i in range(len(listeTir)):
         coord = listeTir[i].Getcoord()
         Xt = coord[0]
         Yt = coord[1]
         if listeTir[i].direction == 0 : #Si le tir provient du joueur
-            for i in range(len(listeEN)):
-                coord = listeEN[i].Getcoord()
+            for t in range(len(listeEN)):
+                coord = listeEN[t].Getcoord()
                 Xe = coord[0]
                 Ye = coord[1]
-                if abs(Xe - Xt) <= 5 and abs(Ye - Yt) <= 5:
-                    del listeEN[i]
-                    del listeTir[i]
+                if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25:
+                    indiceEnnemie.append(listeEN[t])
+                    indiceTir.append(listeTir[i])
                     break
         elif listeTir[i].direction == 1 : #Si le tir provient d'un ennemie 
-            if  abs(Xj - Xt) <= 5 and abs(Yj - Yt) <= 5:
-                del listeTir
-                vie -= 1    
+            if  abs(Xj - Xt) <= 25 and abs(Yj - Yt) <= 25:
+                 
+                indiceTir.append(listeTir[i])
                 break 
-
-                
-
+    for Tir in indiceTir :
+        listeTir.remove(Tir)     
+    print("drsuhfiuygedhguihgdghigudhgdiguhgiurehtireughi : ",indiceEnnemie)      
+    for Ennemie in indiceEnnemie :
+        listeEN.remove(Ennemie)
 
 
 def Partie():
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
     fenetre.Fenetre.bind('w',Amis.TirJoueur)
-
     for i in range(len(listeEN)):
         R = uniform(0,100)
         if R <= 0.05 :
@@ -235,8 +238,8 @@ def Partie():
         Collision(listeTir)
         for i in range(len(listeTir)):
             listeTir[i].Direction()
-    fenetre.Fenetre.after(10,Partie)              
-
+    fenetre.Fenetre.after(10,Partie) 
+     
 
 
 def Debut_Partie(event):
