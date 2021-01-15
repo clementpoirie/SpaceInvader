@@ -135,7 +135,9 @@ class Ennemie:
                 self.Pcanvas.move(self.Pimage, 0, 20)
             elif abs(self.Getcoord()[1] - self.YMAX) <= 0 and self.limite == 1:
                 self.limite = 0
-                self.Direction()          
+                self.Direction()         
+    def actu(self):
+        self.Pcanvas.update()
         fenetre.Fenetre.after(10,self.Mouvement)
     def Getcoord(self):
         # fonction pour récuperer les coordonnées du Vaisseau
@@ -215,40 +217,48 @@ def creationEnnemie(Toile , Bouton ):
             listeEN.append(Ennemie(Toile,1,X,Y)) 
     return listeEN 
 
+
 def Collision(listeTir):
     coord = Amis.Getcoord()
     Xj = coord[0]
     Yj = coord[1]
+    indiceTir = []
+    indiceEnnemie = []
     for i in range(len(listeTir)):
         coord = listeTir[i].Getcoord()
         Xt = coord[0]
         Yt = coord[1]
         if listeTir[i].direction == 0 : #Si le tir provient du joueur
-            for i in range(len(listeEN)):
-                coord = listeEN[i].Getcoord()
+            for t in range(len(listeEN)):
+                coord = listeEN[t].Getcoord()
                 Xe = coord[0]
                 Ye = coord[1]
-                if abs(Xe - Xt) <= 5 and abs(Ye - Yt) <= 5:
-                    del listeEN[i]
-                    del listeTir[i]
-                    break
+                if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25:
+                    indiceEnnemie.append(listeEN[t])
+                    indiceTir.append(listeTir[i])
         elif listeTir[i].direction == 1 : #Si le tir provient d'un ennemie 
-            if  abs(Xj - Xt) <= 5 and abs(Yj - Yt) <= 5:
-                del listeTir
-                vie -= 1    
-                break 
+            if  abs(Xj - Xt) <= 25 and abs(Yj - Yt) <= 25:
+                vie -=1
+                indiceTir.append(listeTir[i])
+    for Tir in indiceTir :
+        listeTir.remove(Tir)        
+    for Ennemie in indiceEnnemie :
+        listeEN.remove(Ennemie)
+    for i in range(len(listeEN)):
+        listeEN[i].actu()   
 
 
-
-def genererFenetreRecommencer():
+def genererFenetreRecommencer(defaite):
     fenetreRecommencer = Toplevel()
     fenetreRecommencer.overrideredirect(1)
     fenetreRecommencer.title("Recommencer")
     fenetreRecommencer.geometry("500x500+500+200")
        
-      
-    
-    etatFinJeu = Label(fenetreRecommencer , text = 'VICTOIRE' , font=("Courier", 40)  )    
+    if defaite == True :
+        etatFinJeu = Label(fenetreRecommencer , text = 'DEFAITE' , font=("Courier", 40)  )   
+    else:
+        etatFinJeu = Label(fenetreRecommencer , text = 'VICTOIRE' , font=("Courier", 40)  )
+
     boutonQuitter = Button(fenetreRecommencer , text = "Quitter", command = fenetreRecommencer.destroy)
     boutonRejouer = Button(fenetreRecommencer , text = "Recommencer", command = fenetreRecommencer.destroy)
     boutonNiveau = Button(fenetreRecommencer , text = "Choix du niveau", command = genererFenetreDifficulte)
@@ -311,7 +321,7 @@ def Partie():
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
     fenetre.Fenetre.bind('w',Amis.TirJoueur)
-
+    VictoireDefaite()
     for i in range(len(listeEN)):
         R = uniform(0,100)
         if R <= 0.05 :
@@ -323,22 +333,32 @@ def Partie():
         Collision(listeTir)
         for i in range(len(listeTir)):
             listeTir[i].Direction()
-    fenetre.Fenetre.after(10,Partie)              
-
+    fenetre.Fenetre.after(10,Partie) 
 
 
 def Debut_Partie(event):
+    vie = 3
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
-    fenetre.Fenetre.after(10,Partie)    
+    fenetre.Fenetre.after(10,Partie)     
+
+def VictoireDefaite():
+   if vie == 0 :
+       defaite = True
+       genererFenetreRecommencer(defaite)
+   if listeEN == [] :
+        defaite = False
+        genererFenetreRecommencer(defaite)
+          
 
 
                     
 ###################################################################################################################################################
 #                                                            Main
 ###################################################################################################################################################
-
+global vie
+vie = 3
 fenetre = CInterface()
 fenetre.Fenetre.bind('x',Debut_Partie)
 

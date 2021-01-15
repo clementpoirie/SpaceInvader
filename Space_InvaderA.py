@@ -240,6 +240,10 @@ def Partie(vie):
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
     fenetre.Fenetre.bind('w',Amis.TirJoueur)
+<<<<<<< HEAD
+    #VictoireDefaite()
+=======
+>>>>>>> da56f13d85fb15e48087966026e5d297de1191b9
     for i in range(len(listeEN)):
         listeEN[i].actu()  
         R = uniform(0,100)
@@ -264,6 +268,22 @@ def Debut_Partie(event):
     fenetre.Fenetre.after(10,lambda : Partie(vie))    
 
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+#def VictoireDefaite():
+    #if vie == 0 :
+        #afficher une fenetre défaite
+    #elif listeEN == [] :
+        #afficher la fenetre victoire proposant de passer au niveau suivant ou de recommencer    
+=======
+def VictoireDefaite():
+    if vie == 0 :
+        print("Défaite")
+    elif listeEN == [] :
+        print("Victoire") 
+>>>>>>> da56f13d85fb15e48087966026e5d297de1191b9
+>>>>>>> 60a8974854bd4cf4cf5d76ea4d3be7904ebc274f
                     
 ###################################################################################################################################################
 #                                                            Main
