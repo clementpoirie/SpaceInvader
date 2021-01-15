@@ -171,6 +171,7 @@ class Camis:
         return self.Pcanvas.coords(self.Pimage)    
     def TirJoueur(self,event):
         coord = self.Getcoord()
+        print('TIR')
         Xj = coord[0]
         Yj = coord[1]
         listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",0,Xj,Yj))
@@ -182,6 +183,8 @@ def creationEnnemie(Toile):
     listeEN = []
     global listeTir
     listeTir = []
+    global vie
+    vie = 3
     X = 25
     Y = 25
     for  i in range(25):
@@ -192,7 +195,7 @@ def creationEnnemie(Toile):
             Y = Y + 100
             X = 25
             listeEN.append(Ennemie(Toile,1,X,Y)) 
-    return listeEN 
+     
 
 def Collision(listeTir):
     coord = Amis.Getcoord()
@@ -200,6 +203,7 @@ def Collision(listeTir):
     Yj = coord[1]
     indiceTir = []
     indiceEnnemie = []
+    print(listeTir)
     for i in range(len(listeTir)):
         coord = listeTir[i].Getcoord()
         Xt = coord[0]
@@ -216,21 +220,25 @@ def Collision(listeTir):
             if  abs(Xj - Xt) <= 25 and abs(Yj - Yt) <= 25:
                 vie -=1
                 indiceTir.append(listeTir[i])
-    for Tir in indiceTir :
-        listeTir.remove(Tir)        
-    for Ennemie in indiceEnnemie :
-        listeEN.remove(Ennemie)
-    for i in range(len(listeEN)):
-        listeEN[i].actu()   
+        if Yt < 0 or Yt > 1350 :
+            indiceTir.append(listeTir[i])
+    if indiceTir != []:
+        for Tir in indiceTir :
+            if Tir in listeTir:          
+                listeTir.remove(Tir)  
+    if indiceEnnemie != []:
+        for Ennemie in indiceEnnemie :      
+            if Ennemie in listeEN:
+                listeEN.remove(Ennemie) 
 
 def Partie():
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
     fenetre.Fenetre.bind('w',Amis.TirJoueur)
-    VictoireDefaite()
     for i in range(len(listeEN)):
+        listeEN[i].actu()  
         R = uniform(0,100)
-        if R <= 0.05 :
+        if R <= 0.00000005 :
             coord = listeEN[i].Getcoord()
             Xe = coord[0]
             Ye = coord[1]
@@ -240,12 +248,10 @@ def Partie():
         for i in range(len(listeTir)):
             listeTir[i].Direction()
     fenetre.Fenetre.after(10,Partie) 
-     
+    VictoireDefaite()
 
 
 def Debut_Partie(event):
-    global vie
-    vie = 3
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
@@ -253,9 +259,9 @@ def Debut_Partie(event):
 
 def VictoireDefaite():
     if vie == 0 :
-        #afficher une fenetre défaite
+        print("Défaite")
     elif listeEN == [] :
-        #afficher la fenetre victoire proposant de passer au niveau suivant ou de recommencer    
+        print("Victoire") 
                     
 ###################################################################################################################################################
 #                                                            Main
