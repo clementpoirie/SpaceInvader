@@ -23,7 +23,7 @@ from tkinter import  PhotoImage , ALL ,Menu , Toplevel , DISABLED
 #                                                          Classes
 ###################################################################################################################################################
 
-class CInterface:
+class CInterface :
     def __init__ (self):
         self.CreerFenetre()
         self.CreerToile()
@@ -67,13 +67,18 @@ class CInterface:
         self.Fond = self.Toile.create_image(0, 0, image=self.ImageFond, anchor='nw')
 
 
-    def CreerChamps(self):
+    def CreerChamps(self ,):
         "Creation des champs"
         self.Score = Label(self.Fenetre, text="Score :" + '100', font='Arial 10', fg='black',anchor='w', borderwidth=0 , padx = 20)
         self.Score.grid(row=0, column=0, sticky='nw')
 
-        self.Vie = Label(self.Fenetre, text="Vie : " + '3', font='Arial 10', fg='black',anchor='w', borderwidth=0)
+        self.Vie = Label(self.Fenetre, text="Vie : " + str(Vie), font='Arial 10', fg='black',anchor='w', borderwidth=0)
         self.Vie.grid(row=0, column=2, sticky='nw')
+
+    def actuChamps(self):
+        self.Vie.update()
+        self.Score.update()
+        
     
     def CreerBoutons(self):
         self.Btn_Quitter = Button(self.Fenetre, text ='Quitter', width=15, command= genererFenetreRecommencer)#self.Fenetre.destroy)
@@ -218,34 +223,6 @@ def creationEnnemie(Toile , Bouton ):
     return listeEN 
 
 
-def Collision(listeTir):
-    coord = Amis.Getcoord()
-    Xj = coord[0]
-    Yj = coord[1]
-    indiceTir = []
-    indiceEnnemie = []
-    for i in range(len(listeTir)):
-        coord = listeTir[i].Getcoord()
-        Xt = coord[0]
-        Yt = coord[1]
-        if listeTir[i].direction == 0 : #Si le tir provient du joueur
-            for t in range(len(listeEN)):
-                coord = listeEN[t].Getcoord()
-                Xe = coord[0]
-                Ye = coord[1]
-                if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25:
-                    indiceEnnemie.append(listeEN[t])
-                    indiceTir.append(listeTir[i])
-        elif listeTir[i].direction == 1 : #Si le tir provient d'un ennemie 
-            if  abs(Xj - Xt) <= 25 and abs(Yj - Yt) <= 25:
-                vie -=1
-                indiceTir.append(listeTir[i])
-    for Tir in indiceTir :
-        listeTir.remove(Tir)        
-    for Ennemie in indiceEnnemie :
-        listeEN.remove(Ennemie)
-    for i in range(len(listeEN)):
-        listeEN[i].actu()   
 
 
 def genererFenetreRecommencer(defaite):
@@ -317,48 +294,106 @@ def genererFenetreDifficulte():
     boutonQuitter.place(x = 25 , y = 350 , width = 450)
 
 
-def Partie():
-    fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
-    fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
-    fenetre.Fenetre.bind('w',Amis.TirJoueur)
-    VictoireDefaite()
-    for i in range(len(listeEN)):
-        R = uniform(0,100)
-        if R <= 0.05 :
-            coord = listeEN[i].Getcoord()
-            Xe = coord[0]
-            Ye = coord[1]
-            listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,Xe,Ye))
-    if listeTir != []:
-        Collision(listeTir)
-        for i in range(len(listeTir)):
-            listeTir[i].Direction()
-    fenetre.Fenetre.after(10,Partie) 
+def VictoireDefaite(vie , condition):
+    vc = []
+    if condition ==0:
+
+        if vie == 0 :
+            print("Défaite")
+            condition = 1
+            vc.append(0)
+            vc.append(condition)
+            return vc
+        elif listeEN == [] :
+            print("Victoire") 
+            condition = 1
+            vc.append(0)
+            vc.append(condition)
+            return vc
+        else:
+            vc.append(1)
+            vc.append(condition)
+            return vc
+
+def Collision(listeTir,vie):
+    coord = Amis.Getcoord()
+    Xj = coord[0]
+    Yj = coord[1]
+    indiceTir = []
+    indiceEnnemie = []
+    print(vie)
+    for i in range(len(listeTir)):
+        coord = listeTir[i].Getcoord()
+        Xt = coord[0]
+        Yt = coord[1]
+        if listeTir[i].direction == 0 : #Si le tir provient du joueur
+            for t in range(len(listeEN)):
+                coord = listeEN[t].Getcoord()
+                Xe = coord[0]
+                Ye = coord[1]
+                if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25:
+                    indiceEnnemie.append(listeEN[t])
+                    indiceTir.append(listeTir[i])
+        elif listeTir[i].direction == 1 : #Si le tir provient d'un ennemie 
+            if  abs(Xj - Xt) <= 25 and abs(Yj - Yt) <= 25:
+                vie -=1
+                fenetre.Vie.config(text = "Vie : " + str(Vie))
+                indiceTir.append(listeTir[i])
+        if Yt < 0 or Yt > 1350 :
+            indiceTir.append(listeTir[i])
+    if indiceTir != []:
+        for Tir in indiceTir :
+            if Tir in listeTir:          
+                listeTir.remove(Tir)  
+    if indiceEnnemie != []:
+        for Ennemie in indiceEnnemie :      
+            if Ennemie in listeEN:
+                listeEN.remove(Ennemie) 
+    return vie
+
+def Partie(vie , condition):
+    var = VictoireDefaite(vie , condition)
+    victoiredefaite = 1
+    victoiredefaite = var[0]
+    condition = var[1]
+    if victoiredefaite == 1:
+
+        fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
+        fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
+        fenetre.Fenetre.bind('w',Amis.TirJoueur)
+
+        
+        for i in range(len(listeEN)):
+            listeEN[i].actu()  
+            R = uniform(0,100)
+            if R <= 5 :
+                coord = listeEN[i].Getcoord()
+                Xe = coord[0]
+                Ye = coord[1]
+                listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,Xe,Ye))
+        if listeTir != []:
+            vie = Collision(listeTir,vie)
+            for i in range(len(listeTir)):
+                listeTir[i].Direction()
+    fenetre.Fenetre.after(10,lambda : Partie(vie , condition)) 
+        
 
 
 def Debut_Partie(event):
     vie = 3
+    condition = 0
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
-    fenetre.Fenetre.after(10,Partie)     
-
-def VictoireDefaite():
-   if vie == 0 :
-       defaite = True
-       genererFenetreRecommencer(defaite)
-   if listeEN == [] :
-        defaite = False
-        genererFenetreRecommencer(defaite)
-          
-
+    fenetre.Fenetre.after(10,lambda : Partie(vie , condition))    
+  
 
                     
 ###################################################################################################################################################
 #                                                            Main
 ###################################################################################################################################################
-global vie
-vie = 3
+global Vie
+Vie = 3
 fenetre = CInterface()
 fenetre.Fenetre.bind('x',Debut_Partie)
 
