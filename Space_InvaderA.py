@@ -227,7 +227,7 @@ def Partie():
     fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
     fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
     fenetre.Fenetre.bind('w',Amis.TirJoueur)
-    VictoireDefaite()
+    #VictoireDefaite()
     for i in range(len(listeEN)):
         R = uniform(0,100)
         if R <= 0.05 :
@@ -251,10 +251,10 @@ def Debut_Partie(event):
    
     fenetre.Fenetre.after(10,Partie)    
 
-def VictoireDefaite():
-    if vie == 0 :
+#def VictoireDefaite():
+    #if vie == 0 :
         #afficher une fenetre défaite
-    elif listeEN == [] :
+    #elif listeEN == [] :
         #afficher la fenetre victoire proposant de passer au niveau suivant ou de recommencer    
                     
 ###################################################################################################################################################
