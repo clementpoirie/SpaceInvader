@@ -169,7 +169,8 @@ class Tir():
     def Getcoord(self):
         # fonction pour récuperer les coordonnées du Tir
         return self.Pcanvas.coords(self.Pimage)    
-
+    def actu(self):
+        self.Pcanvas.update()
 
 class Camis:
     def __init__(self , canvas ):
@@ -286,6 +287,7 @@ def Collision(listeTir,vie,score):
     indiceTir = []
     indiceEnnemie = []
     for i in range(len(listeTir)):
+        listeTir[i].actu()
         coord = listeTir[i].Getcoord()
         Xt = coord[0]
         Yt = coord[1]

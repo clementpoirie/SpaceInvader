@@ -24,10 +24,13 @@ from tkinter import  PhotoImage , ALL ,Menu , Toplevel , DISABLED
 ###################################################################################################################################################
 
 class CInterface :
-    def __init__ (self):
+    def __init__ (self,vie,score,image):
+        self.vie = str(vie)
+        self.score = str(score)
+        self.FichierGif_Fond = image
         self.CreerFenetre()
-        self.CreerToile()
-        self.CreerChamps()
+        self.CreerToile(self.FichierGif_Fond)
+        self.CreerChamps(self.vie,self.score)
         self.CreerBoutons()
         self.createMenuBar()
 
@@ -42,14 +45,8 @@ class CInterface :
         self.Fenetre.bind("<Escape>", self.Arreter_PleinEcran)
 
         # Le fichier .gif de l'image de fond est dans le répertoire "Gif_Autres", au même niveau que ce programme
-        self.FichierGif_Fond = "Data/StarWars.png"
-        self.FichierPng_Vaisseau = "Data/Chasseur_Tie.png"
 
-        self.ImageFond = PhotoImage(file=self.FichierGif_Fond)
-        self.ImageVaisseau = PhotoImage(file=self.FichierPng_Vaisseau)
-
-        self.LargeurFenetre = self.ImageFond.width()
-        self.HauteurFenetre = self.ImageFond.height()
+       
 
     def Remise_PleineEcran(self, event):
         self.etatFenetre = not self.etatFenetre
@@ -59,32 +56,39 @@ class CInterface :
         self.etatFenetre = False
         self.Fenetre.attributes("-fullscreen", self.etatFenetre)
 
-    def CreerToile(self):
+    def CreerToile(self,FichierGif_Fond):
+        self.ImageFond = PhotoImage(file=FichierGif_Fond)
+
+        self.LargeurFenetre = self.ImageFond.width()
+        self.HauteurFenetre = self.ImageFond.height()
         "Creation de la Toile (Canevas)"
         self.Toile = Canvas(self.Fenetre, width= 1350, height= 850, background='white')
         self.Toile.grid(row=1, column=0 , columnspan = 3 , rowspan = 4 )
-        self.Toile.delete(ALL)
+        
         self.Fond = self.Toile.create_image(0, 0, image=self.ImageFond, anchor='nw')
+        self.Toile.update()
 
-
-    def CreerChamps(self ,):
+    def CreerChamps(self,vie,score):
         "Creation des champs"
-        self.Score = Label(self.Fenetre, text="Score :" + '100', font='Arial 10', fg='black',anchor='w', borderwidth=0 , padx = 20)
+        self.Score = Label(self.Fenetre, text="Score :" + score, font='Arial 10', fg='black',anchor='w', borderwidth=0 , padx = 20)
         self.Score.grid(row=0, column=0, sticky='nw')
 
-        self.Vie = Label(self.Fenetre, text="Vie : " + str(Vie), font='Arial 10', fg='black',anchor='w', borderwidth=0)
+        self.Vie = Label(self.Fenetre, text="Vie : " + vie, font='Arial 10', fg='black',anchor='w', borderwidth=0)
         self.Vie.grid(row=0, column=2, sticky='nw')
 
     def actuChamps(self):
         self.Vie.update()
         self.Score.update()
-        
+
+    def ChangerImage(self,FichierGif_Fond):   
+        self.ImageFond = PhotoImage(file=FichierGif_Fond)
+        self.Toile.itemconfigure(self.Fond, image = self.ImageFond ) 
     
     def CreerBoutons(self):
         self.Btn_Quitter = Button(self.Fenetre, text ='Quitter', width=15, command= genererFenetreRecommencer)#self.Fenetre.destroy)
         self.Btn_Quitter.grid(row=3, column=4, sticky='e', padx=15)
 
-        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : creationEnnemie(self.Toile, self.Btn_Recommencer))
+        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : creationEnnemie(self.Toile, 1))
         self.Btn_Recommencer.grid(row=2, column=4, sticky='e', padx=15)
 
     def createMenuBar(self):
@@ -108,7 +112,7 @@ class CInterface :
 class Ennemie:
     def __init__(self, canvas, ennemie,X,Y):
         self.Pcanvas=canvas
-        self.Pfilename = PhotoImage(file="Data/X-wing_2.png")
+        self.Pfilename = PhotoImage(file="Data/Chasseur_Tie.png")
         self.X = X
         self.Y = Y
         self.Pimage = self.Pcanvas.create_image(self.X,self.Y, image=self.Pfilename)
@@ -173,7 +177,8 @@ class Tir():
     def Getcoord(self):
         # fonction pour récuperer les coordonnées du Tir
         return self.Pcanvas.coords(self.Pimage)    
-
+    def actu(self):
+        self.Pcanvas.update()
 
 class Camis:
     def __init__(self , canvas ):
@@ -195,24 +200,28 @@ class Camis:
         coord = self.Getcoord()
         Xj = coord[0]
         Yj = coord[1]
-        listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",0,Xj,Yj))
-
+        listeTir.append(Tir(fenetre.Toile,"Data/Tir_Vert.png",0,Xj,Yj))
+    def actu(self):
+        self.Pcanvas.update()
 
 ###################################################################################################################################################
 #                                                          FONCTIONS
 ###################################################################################################################################################
 
-def creationEnnemie(Toile , Bouton ):
-    Bouton.config(state = DISABLED)
+def creationEnnemie(Toile,niveau):
     global Amis
     Amis = Camis(Toile)
     global listeEN
     listeEN = []
     global listeTir
     listeTir = []
+    global ChanceTir
+    NbrEnnemies,ChanceTir = Niveau(niveau)
+   
+    Toile.update()
     X = 25
     Y = 25
-    for  i in range(25):
+    for  i in range(NbrEnnemies):
         if X < 1300 :
             listeEN.append(Ennemie(Toile,1,X,Y))
             X=X + 100
@@ -220,9 +229,24 @@ def creationEnnemie(Toile , Bouton ):
             Y = Y + 100
             X = 25
             listeEN.append(Ennemie(Toile,1,X,Y)) 
-    return listeEN 
 
 
+def Niveau(niveau):
+    if niveau == 1 :
+        fenetre.ChangerImage("Data/StarWars.png")
+        return 15,0.05
+    if niveau == 2 :
+        fenetre.ChangerImage("Data/StarWars2.png")
+        return 20,0.1
+    if niveau == 3 :
+        fenetre.ChangerImage("Data/StarWars3.png")
+        return 25,0.15
+    if niveau == 4 :
+        fenetre.ChangerImage("Data/StarWars4.png")
+        return 30,0.2
+    if niveau == 5 :
+        fenetre.ChangerImage("Data/StarWars5.png")
+        return 35,0.25
 
 
 def genererFenetreRecommencer(defaite):
@@ -278,11 +302,11 @@ def genererFenetreDifficulte():
     
     labelTitre = Label(fenetreDifficulte , text = "choisissez le niveau de difficulté :" , font=("Courier", 13) ,  padx = 30 , pady = 15)
     
-    boutonNiv1 = Button(fenetreDifficulte , text = "Facile", bg = 'blue', fg = 'white', command = fenetreDifficulte.destroy)
-    boutonNiv2 = Button(fenetreDifficulte , text = "moyen", bg = 'green' ,fg = 'white', command = fenetreDifficulte.destroy)
-    boutonNiv3 = Button(fenetreDifficulte , text = "difficile", bg = 'red' ,fg = 'white', command = fenetreDifficulte.destroy)
-    boutonNiv4 = Button(fenetreDifficulte , text = "mortel", bg = 'purple' ,fg = 'white',command = fenetreDifficulte.destroy)
-    boutonNiv5 = Button(fenetreDifficulte , text = "hardcore",bg = 'black' ,fg = 'white', command = fenetreDifficulte.destroy)
+    boutonNiv1 = Button(fenetreDifficulte , text = "Facile", bg = 'blue', fg = 'white', command = lambda : creationEnnemie(fenetre.Toile,1))
+    boutonNiv2 = Button(fenetreDifficulte , text = "moyen", bg = 'green' ,fg = 'white', command = lambda : creationEnnemie(fenetre.Toile,2))
+    boutonNiv3 = Button(fenetreDifficulte , text = "difficile", bg = 'red' ,fg = 'white', command = lambda : creationEnnemie(fenetre.Toile,3))
+    boutonNiv4 = Button(fenetreDifficulte , text = "mortel", bg = 'purple' ,fg = 'white',command = lambda : creationEnnemie(fenetre.Toile,4))
+    boutonNiv5 = Button(fenetreDifficulte , text = "hardcore",bg = 'black' ,fg = 'white', command = lambda : creationEnnemie(fenetre.Toile,5))
     boutonQuitter = Button(fenetreDifficulte , text = "quitter", command = fenetreDifficulte.destroy)
     
     labelTitre.place(x = 25 , y = 150)
@@ -300,6 +324,7 @@ def VictoireDefaite(vie , condition):
 
         if vie == 0 :
             print("Défaite")
+            Reinitialisation()
             condition = 1
             vc.append(0)
             vc.append(condition)
@@ -307,15 +332,17 @@ def VictoireDefaite(vie , condition):
         elif listeEN == [] :
             print("Victoire") 
             condition = 1
+            Reinitialisation()
             vc.append(0)
             vc.append(condition)
             genererFenetreRecommencer(False)
         else:
             vc.append(1)
             vc.append(condition)
-            return vc
 
-def Collision(listeTir,vie):
+    return vc
+
+def Collision(listeTir,vie,score):
     coord = Amis.Getcoord()
     Xj = coord[0]
     Yj = coord[1]
@@ -329,15 +356,16 @@ def Collision(listeTir,vie):
         if listeTir[i].direction == 0 : #Si le tir provient du joueur
             for t in range(len(listeEN)):
                 coord = listeEN[t].Getcoord()
+                
                 Xe = coord[0]
                 Ye = coord[1]
                 if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25:
+                    score += 10
                     indiceEnnemie.append(listeEN[t])
                     indiceTir.append(listeTir[i])
         elif listeTir[i].direction == 1 : #Si le tir provient d'un ennemie 
             if  abs(Xj - Xt) <= 25 and abs(Yj - Yt) <= 25:
                 vie -=1
-                fenetre.Vie.config(text = "Vie : " + str(Vie))
                 indiceTir.append(listeTir[i])
         if Yt < 0 or Yt > 1350 :
             indiceTir.append(listeTir[i])
@@ -349,15 +377,15 @@ def Collision(listeTir,vie):
         for Ennemie in indiceEnnemie :      
             if Ennemie in listeEN:
                 listeEN.remove(Ennemie) 
-    return vie
+    fenetre.CreerChamps(str(vie),str(score))            
+    return vie,score
 
-def Partie(vie , condition):
-    var = VictoireDefaite(vie , condition)
-    victoiredefaite = 1
-    victoiredefaite = var[0]
-    condition = var[1]
+def Partie(vie , condition,victoiredefaite,score):
     if victoiredefaite == 1:
-
+        var = VictoireDefaite(vie , condition)
+       
+        victoiredefaite = var[0]
+        condition = var[1]
         fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
         fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
         fenetre.Fenetre.bind('w',Amis.TirJoueur)
@@ -372,29 +400,32 @@ def Partie(vie , condition):
                 Ye = coord[1]
                 listeTir.append(Tir(fenetre.Toile,"Data/Tir_Rouge.png",1,Xe,Ye))
         if listeTir != []:
-            vie = Collision(listeTir,vie)
+            vie,score = Collision(listeTir,vie,score)
             for i in range(len(listeTir)):
                 listeTir[i].Direction()
-    fenetre.Fenetre.after(10,lambda : Partie(vie , condition)) 
+    fenetre.Fenetre.after(10,lambda : Partie(vie , condition,victoiredefaite,score)) 
         
 
 
 def Debut_Partie(event):
     vie = 3
     condition = 0
+    victoiredefaite = 1
     for i in range(len(listeEN)):
         listeEN[i].Mouvement()      
    
-    fenetre.Fenetre.after(10,lambda : Partie(vie , condition))    
+    fenetre.Fenetre.after(10,lambda : Partie(vie , condition,victoiredefaite,score))    
   
-
-                    
+def Reinitialisation():
+    for i in range(len(listeTir)):
+        listeTir[i].Pcanvas.delete(listeTir[i].Pimage)
+    Amis.Pcanvas.delete(Amis.Pimage)                
 ###################################################################################################################################################
 #                                                            Main
 ###################################################################################################################################################
-global Vie
-Vie = 3
-fenetre = CInterface()
+vie = 3
+score = 0
+fenetre = CInterface(vie,score,'data/StarWars.png')
 fenetre.Fenetre.bind('x',Debut_Partie)
 
 fenetre.Mainloop()
