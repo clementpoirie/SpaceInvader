@@ -138,17 +138,17 @@ class Ennemie:
                 self.direction = 1
                 self.limite = 1
                 self.X = 99
-                self.YMAX = self.Getcoord()[1]+20
+                self.YMAX = self.Getcoord()[1]+40
             elif self.Getcoord()[0] <= 5 and self.limite == 0:
                 self.direction = 0
                 self.limite = 1
                 self.X = 1
-                self.YMAX = self.Getcoord()[1]+20    
+                self.YMAX = self.Getcoord()[1]+40   
             elif abs(self.Getcoord()[1] - self.YMAX) > 0 and self.limite == 1:
-                self.Pcanvas.move(self.Pimage, 0, 20)
+                self.Pcanvas.move(self.Pimage, 0, 40)
             elif abs(self.Getcoord()[1] - self.YMAX) <= 0 and self.limite == 1:
                 self.limite = 0
-                self.Direction()         
+                self.Direction()                
     def actu(self):
         self.Pcanvas.update()
         fenetre.Fenetre.after(10,self.Mouvement)
@@ -193,10 +193,21 @@ class Camis:
         #self.Fond = self.vaisseau.create_image(0, 0, image=self.ImageFond, anchor='nw')
         #self.vaisseau.place(x = 1350 / 2 , y = 850 - 100)
     def mouvementG(self,event):
-        self.Pcanvas.move(self.Pimage, -10, 0)
+        coord = self.Getcoord()
+        Xj = coord[0]
+        if Xj >= 5:
+            self.Pcanvas.move(self.Pimage, -10, 0)
+        else :
+            self.Pcanvas.move(self.Pimage, 2, 0)  
 
     def mouvementD (self,event):
-        self.Pcanvas.move(self.Pimage, 10, 0)          
+        coord = self.Getcoord()
+        Xj = coord[0]
+        if Xj <= 1325:
+            self.Pcanvas.move(self.Pimage, 10, 0) 
+        else :
+            self.Pcanvas.move(self.Pimage, -2, 0)   
+
     def Getcoord(self):
         # fonction pour récuperer les coordonnées du joueur
         return self.Pcanvas.coords(self.Pimage)    
@@ -324,9 +335,14 @@ def genererFenetreDifficulte():
     
 def VictoireDefaite(vie , condition):
     vc = []
+    perdu = 0
     if condition ==0:
-
-        if vie == 0 :
+        for i in range(len(listeEN)):
+            coord = listeEN[i].Getcoord() 
+            Ye = coord[1]
+            if Ye > 850 :
+                perdu = 1
+        if vie == 0 or perdu == 1 :
             print("Défaite")
             Reinitialisation()
             condition = 1
@@ -364,7 +380,7 @@ def Collision(listeTir,vie,score,bestscore):
                 
                 Xe = coord[0]
                 Ye = coord[1]
-                if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25:
+                if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25 :
                     score += 10
                     modifBestscore(bestscore , score)
                     indiceEnnemie.append(listeEN[t])
@@ -404,7 +420,7 @@ def Partie(vie,score,condition):
 
 
         for i in range(len(listeEN)):
-            listeEN[i].actu()  
+            listeEN[i].actu()
             R = uniform(0,100)
             if R <= ChanceTir :
                 coord = listeEN[i].Getcoord()
