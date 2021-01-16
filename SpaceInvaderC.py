@@ -16,8 +16,8 @@ Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 ###################################################################################################################################################
 from random import uniform
 from tkinter import Tk, Label, Button, Canvas
-from tkinter import  PhotoImage , ALL ,Menu , Toplevel , DISABLED
-
+from tkinter import  PhotoImage , ALL ,Menu , Toplevel , DISABLED 
+from time import sleep
 
 ###################################################################################################################################################
 #                                                          Classes
@@ -88,7 +88,7 @@ class CInterface :
         self.Btn_Quitter = Button(self.Fenetre, text ='Quitter', width=15, command= self.Fenetre.destroy)#self.Fenetre.destroy)
         self.Btn_Quitter.grid(row=3, column=4, sticky='e', padx=15)
 
-        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : creationEnnemie(self.Toile, 1))
+        self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : [genererFenetreX() , creationEnnemie(self.Toile, 1)])
         self.Btn_Recommencer.grid(row=2, column=4, sticky='e', padx=15)
 
     def CreerMenu(self):
@@ -98,6 +98,7 @@ class CInterface :
         menuFile.add_command(label="Nouvelle partie", command= lambda : creationEnnemie(self.Toile , self.Btn_Recommencer ))
         menuFile.add_command(label="Aide" , command = genererFenetreAide)
         menuFile.add_command(label="Difficulté" , command = genererFenetreDifficulte)
+        menuFile.add_command(label="à propos" , command = genererFenetrePropos)
 
         menuFile.add_separator()
 
@@ -309,6 +310,40 @@ def genererFenetreAide():
 
     boutonQuitter.place(x = 25 , y = 350 , width = 450)
 
+def genererFenetrePropos():
+    fenetreAide = Toplevel()
+    fenetreAide.overrideredirect(1)
+    fenetreAide.title("à propos")
+    fenetreAide.geometry('500x270+500+200')
+
+    label1 = Label(fenetreAide , text ="Qui sommes nous ? " , font=("Courier", 15))
+    toucheX = Label(fenetreAide , text ="Nous sommes deux étudiants de CPE Lyon nous avons réalisé ce jeu pour que les fans ")
+    toucheESP = Label(fenetreAide , text ="de star wars puissent enfin jouer au space invader")
+    
+    label2 = Label(fenetreAide , text ="Le meilleur score réalisé est : " + lectureBestscore() , font=("Courier", 15))
+    boutonQuitter = Button(fenetreAide , text = "quitter", command = fenetreAide.destroy)
+    
+    
+    label1.place(x = 25 , y = 50)
+    toucheX.place(x = 25 , y = 85 )
+    toucheESP.place(x = 25 , y = 100)
+    label2.place(x = 25 , y = 150 )
+    boutonQuitter.place(x = 25 , y = 230 , width = 450)
+
+def genererFenetreX():
+    fenetreAide = Toplevel()
+    fenetreAide.overrideredirect(1)
+    fenetreAide.title("à propos")
+    fenetreAide.geometry('500x100+500+200')
+
+    label1 = Label(fenetreAide , text ="appuyez sur x quand vous êtes prêt" , font=("Courier", 15))
+    boutonQuitter = Button(fenetreAide , text = "quitter", command = fenetreAide.destroy)
+    label1.place(x = 25 , y = 25)
+    boutonQuitter.place(x=25 , y = 60 , width = 450)
+    
+    
+
+
 def genererFenetreDifficulte():
     fenetreDifficulte = Toplevel()
     fenetreDifficulte.overrideredirect(1)
@@ -436,6 +471,7 @@ def Partie(vie,score,condition):
 
 
 def Debut_Partie(event):
+   
     fenetre.Btn_Recommencer.config(state = DISABLED)
     vie = 3
     condition = 0
