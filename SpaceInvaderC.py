@@ -122,6 +122,7 @@ class CInterface :
         self.Fenetre.mainloop()
 
 class Ennemie:
+
     def __init__(self, canvas, ennemie,X,Y):
         self.Pcanvas=canvas
         self.Pfilename = PhotoImage(file="Data/Chasseur_Tie.png")
@@ -132,12 +133,13 @@ class Ennemie:
         self.limite = 0
         self.YMAX = 0
         self.ennemie = ennemie
+
     def Mouvement(self):
         #Fonction permmettant le déplacement du vaisseau ennemie
         #Méthode : Si le vaisseau se trouve dans la fenêtre, il se déplace soit à gauche soit à droite suivant la valeur de direction
         #Ensuite si le vaiseau s'apprête à sortir de l'écran on initialise une valeur limite à 1 pour qu'il ne rentre plus dans le premier if
         #puis on initalise une autre valeur qui servira de limite quant au déplacement du vaisseau vers le bas; cette dernière valeur récupère la coordonnée
-        #en Y du vaisseau puis lui rajoute une certaine valeur, par la suit cette valeur sera comparée avec la prochaine coordonnée du vaisseau.
+        #en Y du vaisseau puis lui rajoute une certaine valeur, par la suite cette valeur sera comparée avec la prochaine coordonnée du vaisseau.
         #Si la différence est égale à 0, on repasse la valeur limite à 0 puis on recommence le déplacement avec la direction changée
         if self.Getcoord()[1] < 850 :
             if self.Getcoord()[0] > 5 and self.Getcoord()[0] < 1345 and self.limite == 0 : #légerement inférieur a la taille du canavs
@@ -156,21 +158,26 @@ class Ennemie:
                 self.Pcanvas.move(self.Pimage, 0, 40)
             elif abs(self.Getcoord()[1] - self.YMAX) <= 0 and self.limite == 1:
                 self.limite = 0
-                self.Direction()                
+                self.Direction()   
+
     def actu(self):
+        #Permet d'actualiser la fenêtre
         self.Pcanvas.update()
         fenetre.Fenetre.after(10,self.Mouvement)
+
     def Getcoord(self):
         # fonction pour récuperer les coordonnées du Vaisseau
         return self.Pcanvas.coords(self.Pimage)
 
     def Direction(self):
+        #Permet aux ennemies de se déplacer vers la gauche ou la droite suivant la valeur de direction
         if self.direction == 0:
             self.Pcanvas.move(self.Pimage, 10, 0)
         elif self.direction == 1:
             self.Pcanvas.move(self.Pimage, -10, 0)
 
 class Tir():
+
     def __init__(self,canvas,Tir,direction,X,Y):
         self.Pcanvas = canvas
         self.Pfilename = PhotoImage(file=Tir)
@@ -186,10 +193,13 @@ class Tir():
              self.Pcanvas.move(self.Pimage, 0, -10)
         elif self.direction == 1:
             self.Pcanvas.move(self.Pimage, 0, 10)
+
     def Getcoord(self):
         # fonction pour récuperer les coordonnées du Tir
-        return self.Pcanvas.coords(self.Pimage)    
+        return self.Pcanvas.coords(self.Pimage)  
+
     def actu(self):
+        #Permet d'actualiser la fenêtre
         self.Pcanvas.update()
 
 class Camis:
@@ -197,10 +207,8 @@ class Camis:
         self.Pcanvas=canvas
         self.Pfilename = PhotoImage(file="Data/X-wing_2.png")
         self.Pimage = self.Pcanvas.create_image(675,750, image=self.Pfilename)
-        #self.vaisseau = Canvas(self.Pcanvas, width = 20 , height = 20 , background = 'white') 
-        #self.Fond = self.vaisseau.create_image(0, 0, image=self.ImageFond, anchor='nw')
-        #self.vaisseau.place(x = 1350 / 2 , y = 850 - 100)
     def mouvementG(self,event):
+        #Permet de déplacer le vaisseau vers la gauche et de le bloquer si il sort de l'écran
         coord = self.Getcoord()
         Xj = coord[0]
         if Xj >= 5:
@@ -209,6 +217,7 @@ class Camis:
             self.Pcanvas.move(self.Pimage, 2, 0)  
 
     def mouvementD (self,event):
+        #Permet de déplacer le vaisseau vers la droite et de le bloquer si il sort de l'écran
         coord = self.Getcoord()
         Xj = coord[0]
         if Xj <= 1325:
@@ -220,56 +229,78 @@ class Camis:
         # fonction pour récuperer les coordonnées du joueur
         return self.Pcanvas.coords(self.Pimage)    
     def TirJoueur(self,event):
-        coord = self.Getcoord()
+        #Permet de créer un tir provenant du joueur
+        coord = self.Getcoord() #coordonnée actuelle du joueur
         Xj = coord[0]
         Yj = coord[1]
         listeTir.append(Tir(fenetre.Toile,"Data/Tir_Vert.png",0,Xj,Yj))
+
     def actu(self):
+        #Permet d'actualiser la fenêtre
         self.Pcanvas.update()
 
 ###################################################################################################################################################
 #                                                          FONCTIONS
 ###################################################################################################################################################
 
-def creationEnnemie(Toile,niveau):
+def Initialisation(Toile,niveau):
+    #Fonction permettant d'initialiser les variables nécéssaires
     global Amis
-    Amis = Camis(Toile)
+    Amis = Camis(Toile) #Vaisseau du joueur
     global listeEN
-    listeEN = []
+    listeEN = [] #Liste contenant tout les ennemies
     global listeTir
-    listeTir = []
+    listeTir = [] #Liste contenant tout les tir
     global ChanceTir
     NbrEnnemies,ChanceTir = Niveau(niveau)
-   
     Toile.update()
-    X = 25
-    Y = 25
+    return Amis,listeEN,listeTir,NbrEnnemies,ChanceTir
+
+def creationEnnemie(Toile,niveau):
+    #Fonction permettant de créer les ennemies, pour cela on crée une liste contentant des objets de la classe Ennemies
+    #Ce sera via cette liste qu'on contrôleras les ennemies par la suite
+    Amis,listeEN,listeTir,NbrEnnemies,ChanceTir = Initialisation(Toile,niveau)
+    
+    DebutX = 25 #Coordonnées du premier ennemies crée
+    DebutY = 25
     for  i in range(NbrEnnemies):
-        if X < 1300 :
-            listeEN.append(Ennemie(Toile,1,X,Y))
-            X=X + 100
-        else:
-            Y = Y + 100
-            X = 25
-            listeEN.append(Ennemie(Toile,1,X,Y)) 
+        if DebutX < 1300 :
+            listeEN.append(Ennemie(Toile,1,DebutX,DebutY))
+            DebutX=DebutX + 100 #permet de décaler le vaisseau suivant lors de la création
+        else: #Si le prochain vaisseau crée sort de l'écran on le déplace vers le bas et on le remet tout à gauche de l'écran
+            DebutY = DebutY  + 100
+            DebutX = 25
+            listeEN.append(Ennemie(Toile,1,DebutX,DebutY)) 
 
 
 def Niveau(niveau):
+    #Permet de choisir un niveau suivant celui sélectionné. Le niveau de difficulté permet de changer l'image de fond,
+    #de changer la fréquence des tir des ennemies ainsi que leurs nombres
     if niveau == 1 :
         fenetre.ChangerImage("Data/StarWars.png")
-        return 15,0.05
+        NbrEnnemies = 15
+        ChanceTir = 0.05
     if niveau == 2 :
         fenetre.ChangerImage("Data/StarWars2.png")
+        NbrEnnemies = 20
+        ChanceTir = 0.1
         return 20,0.1
     if niveau == 3 :
         fenetre.ChangerImage("Data/StarWars3.png")
+        NbrEnnemies = 25
+        ChanceTir = 0.5
         return 25,0.5
     if niveau == 4 :
         fenetre.ChangerImage("Data/StarWars4.png")
+        NbrEnnemies = 30
+        ChanceTir = 1
         return 30,1
     if niveau == 5 :
         fenetre.ChangerImage("Data/StarWars5.png")
+        NbrEnnemies = 35
+        ChanceTir = 1.5
         return 35,1.5
+    return NbrEnnemies,ChanceTir
 
 #créé la fenetre recommencer
 def genererFenetreRecommencer(defaite):
@@ -379,61 +410,73 @@ def genererFenetreDifficulte():
 
     
 def VictoireDefaite(vie , condition):
-    vc = []
+    #Permet de verifier si la partie est gagné ou perdu
+    #La variable condition permet de ne lancer qu'une fois la fonction genererFentreRecommencer
     perdu = 0
     if condition ==0:
-        for i in range(len(listeEN)):
+        for i in range(len(listeEN)): #Cette boucle permet de déterminer si un vaisseau ennemie touche le bas de l'écran
             coord = listeEN[i].Getcoord() 
             Ye = coord[1]
             if Ye > 850 :
                 perdu = 1
-        if vie == 0 or perdu == 1 :
+        if vie == 0 or perdu == 1 : #Si le joueur n'as plus de vie ou un vaisseau a touche le bas de l'écran
             Reinitialisation()
             condition = 1
-            vc.append(0)
-            vc.append(condition)
             genererFenetreRecommencer(True)
-        elif listeEN == [] : 
+        elif listeEN == [] : #Si il n'y a plus d'ennemie
             condition = 1
             Reinitialisation()
-            vc.append(0)
-            vc.append(condition)
             genererFenetreRecommencer(False)
-        else:
-            vc.append(1)
-            vc.append(condition)
-
-    return vc
+    return condition
 
 def Collision(listeTir,vie,score,bestscore):
-    coord = Amis.Getcoord()
-
-    Xj = coord[0]
-    Yj = coord[1]
+    #Fonction permettant de gérer les collision entre les tirs et les différents vaisseau
+    #Méthode : on parcourt la liste des tirs, on récupere leurs coordonnées puit on verifie d'ou provient le tir
     indiceTir = []
     indiceEnnemie = []
-    print(vie)
     for i in range(len(listeTir)):
         coord = listeTir[i].Getcoord()
         Xt = coord[0]
         Yt = coord[1]
-        if listeTir[i].direction == 0 : #Si le tir provient du joueur
-            for t in range(len(listeEN)):
-                coord = listeEN[t].Getcoord()
-                
-                Xe = coord[0]
-                Ye = coord[1]
-                if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25 :
-                    score += 10
-                    modifBestscore(bestscore , score)
-                    indiceEnnemie.append(listeEN[t])
-                    indiceTir.append(listeTir[i])
+        if listeTir[i].direction == 0 : #Si le tir provient du joueur   
+            indiceEnnemie,indiceTir,score = CollisionEnnemies(i,Xt,Yt,indiceEnnemie,indiceTir,score,bestscore)
         elif listeTir[i].direction == 1 : #Si le tir provient d'un ennemie 
-            if  abs(Xj - Xt) <= 25 and abs(Yj - Yt) <= 25:
-                vie -=1
-                indiceTir.append(listeTir[i])
-        if Yt < 0 or Yt > 1350 :
+            indiceTir,vie = CollisionJoueur(i,Xt,Yt,indiceTir,vie)
+        if Yt < 0 or Yt > 1350 : #Si le tir sort de l'écran
             indiceTir.append(listeTir[i])
+    Supprimer(indiceTir,indiceEnnemie)
+    fenetre.CreerChamps(str(vie),str(score)) #actualise la vie et le score sur l'interface           
+    return vie,score
+
+def CollisionEnnemies(i,Xt,Yt,indiceEnnemie,indiceTir,score,bestscore):
+    #On parcourt la liste des ennemies on récupère leurs coordonnées
+    #puis on le compare aux coordonnée du tir et si la distance est suffisante
+    #on récupère l'indice du tir et de l'ennemie afin de les supprimer par la suite 
+    #on modifie également le score
+    for t in range(len(listeEN)):
+            coord = listeEN[t].Getcoord()           
+            Xe = coord[0]
+            Ye = coord[1]
+            if abs(Xe - Xt) <= 25 and abs(Ye - Yt) <= 25 :
+                score += 10
+                modifBestscore(bestscore , score)
+                indiceEnnemie.append(listeEN[t])
+                indiceTir.append(listeTir[i])
+    return indiceEnnemie,indiceTir,score
+
+def CollisionJoueur(i,Xt,Yt,indiceTir,vie):
+    #On récupère les coordonnées du joueur puis on les comparent avec les coordonnées du tir
+    #si la disantce est suffisante on récupère l'indice du tir et on enlève une vie au joueur
+    coord = Amis.Getcoord()
+    Xj = coord[0]
+    Yj = coord[1]
+    if  abs(Xj - Xt) <= 25 and abs(Yj - Yt) <= 25:
+            vie -=1
+            indiceTir.append(listeTir[i])
+    return indiceTir,vie
+
+def Supprimer(indiceTir,indiceEnnemie):
+    #Permet de supprimer les tirs et les ennemies suivant les indices récuperer précédemment
     if indiceTir != []:
         for Tir in indiceTir :
             if Tir in listeTir:          
@@ -442,25 +485,20 @@ def Collision(listeTir,vie,score,bestscore):
         for Ennemie in indiceEnnemie :      
             if Ennemie in listeEN:
                 listeEN.remove(Ennemie) 
-    fenetre.CreerChamps(str(vie),str(score))            
-    return vie,score
-
-
 
 def Partie(vie,score,condition):
-    var = VictoireDefaite(vie , condition)
-    victoiredefaite = 1
-    victoiredefaite = var[0]
-    condition = var[1]
+    #Fonction principale
+    #Parcourt la liste d'ennemies, choisi un nombre aléatoire entre 0 et 100, si celui-ci est inférieur à ChanceTir
+    #On récupère les coordonnées du vaisseau puis on initialise un tir à ces coordonnées
+    #Si la liste des tir n'est pas vide on accède à la fonction Collision puis on permet au tir de se déplacer
+    condition = VictoireDefaite(vie , condition)
     meilleurScore = lectureBestscore()
     meilleurScore_int = float(meilleurScore)
-    if victoiredefaite == 1:
+    if condition == 0:
 
         fenetre.Fenetre.bind('<Left>',Amis.mouvementG)
         fenetre.Fenetre.bind('<Right>',Amis.mouvementD)
         fenetre.Fenetre.bind('w',Amis.TirJoueur)
-
-
 
         for i in range(len(listeEN)):
             listeEN[i].actu()
@@ -474,20 +512,18 @@ def Partie(vie,score,condition):
             vie,score = Collision(listeTir,vie,score,meilleurScore_int)
             for i in range(len(listeTir)):
                 listeTir[i].Direction()
-    fenetre.Fenetre.after(10,lambda : Partie(vie,score,condition)) 
+    fenetre.Fenetre.after(10,lambda : Partie(vie,score,condition)) #Commande qui permet d'actualiser la fenêtre et de lancer la fonction Partie toutes les 10ms
     VictoireDefaite(vie ,condition)       
 
 
 def Debut_Partie(event):
-   
+    #Permet d'initialise la partie en permettant à chaque ennemies de se déplacer
     fenetre.Btn_Recommencer.config(state = DISABLED) #désactive le bouton nouvelle partie
     vie = 3
     condition = 0
-    victoiredefaite = 1
     for i in range(len(listeEN)):
-        listeEN[i].Mouvement()      
-   
-    fenetre.Fenetre.after(10,lambda : Partie(vie,score,condition)) 
+        listeEN[i].Mouvement()        
+    Partie(vie,score,condition) 
 
 #permet de lire le fichier texte score.txt et de retourner ce qu'il y a dedans
 def lectureBestscore():
@@ -507,8 +543,9 @@ def modifBestscore(ancien , nouveau):
 
 
 def Reinitialisation():
+    #Supprime tous les tir restants sur l'écran ansi que le vaisseau du joueur
     for i in range(len(listeTir)):
-        listeTir[i].Pcanvas.delete(listeTir[i].Pimage)
+        listeTir[i].Pcanvas.delete(listeTir[i].Pimage)  
     Amis.Pcanvas.delete(Amis.Pimage)       
 
 
