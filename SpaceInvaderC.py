@@ -7,6 +7,9 @@ Ce programme permet via tkinter de jouer à une version du jeu Space Invader
 Auteur : Adrien Lapalus , Poirié clément
 Il a été réalisé le 18/12/2020
 A faire : 
+- fenetre informative sur le x disparaisse dès qu'on appuye sur x
+- Créer des zones de protection
+
 
 Lien du git : https://github.com/clementpoirie/SpaceInvader.git
 """
@@ -22,7 +25,7 @@ from time import sleep
 ###################################################################################################################################################
 #                                                          Classes
 ###################################################################################################################################################
-
+#class interface graphique gérant toute la fenêtre principale
 class CInterface :
     def __init__ (self,vie,score,image):
         self.vie = str(vie)
@@ -34,6 +37,7 @@ class CInterface :
         self.CreerBoutons()
         self.CreerMenu()
 
+    #création de la fenêtre
     def CreerFenetre(self):
         "Creation de la fenetre"
         self.Fenetre = Tk()
@@ -41,21 +45,23 @@ class CInterface :
         self.Fenetre.attributes('-fullscreen', True)
 
         self.etatFenetre = False
-        self.Fenetre.bind("<F11>", self.Remise_PleineEcran)
-        self.Fenetre.bind("<Escape>", self.Arreter_PleinEcran)
+        self.Fenetre.bind("<F11>", self.Remise_PleineEcran) #event permettant la remise en pleine écran
+        self.Fenetre.bind("<Escape>", self.Arreter_PleinEcran) #event permettant l'arrêt du pleine écran
 
         # Le fichier .gif de l'image de fond est dans le répertoire "Gif_Autres", au même niveau que ce programme
 
        
-
+    #permet la remise en pleine écran
     def Remise_PleineEcran(self, event):
         self.etatFenetre = not self.etatFenetre
         self.Fenetre.attributes("-fullscreen", self.etatFenetre)
 
+    #event permettant l'arrêt du pleine écran
     def Arreter_PleinEcran(self, event):
         self.etatFenetre = False
         self.Fenetre.attributes("-fullscreen", self.etatFenetre)
 
+    #création du canvas de jeu
     def CreerToile(self,FichierGif_Fond):
         self.ImageFond = PhotoImage(file=FichierGif_Fond)
 
@@ -68,6 +74,7 @@ class CInterface :
         self.Fond = self.Toile.create_image(0, 0, image=self.ImageFond, anchor='nw')
         self.Toile.update()
 
+    #création des Label 
     def CreerChamps(self,vie,score):
         "Creation des champs"
         self.Score = Label(self.Fenetre, text="Score :" + score, font='Arial 10', fg='black',anchor='w', borderwidth=0 , padx = 20)
@@ -76,14 +83,12 @@ class CInterface :
         self.Vie = Label(self.Fenetre, text="Vie : " + vie, font='Arial 10', fg='black',anchor='w', borderwidth=0)
         self.Vie.grid(row=0, column=2, sticky='nw')
 
-    def actuChamps(self):
-        self.Vie.update()
-        self.Score.update()
-
+    # change l'image du background du canvas 
     def ChangerImage(self,FichierGif_Fond):   
         self.ImageFond = PhotoImage(file=FichierGif_Fond)
         self.Toile.itemconfigure(self.Fond, image = self.ImageFond ) 
     
+    # création des boutons
     def CreerBoutons(self):
         self.Btn_Quitter = Button(self.Fenetre, text ='Quitter', width=15, command= self.Fenetre.destroy)#self.Fenetre.destroy)
         self.Btn_Quitter.grid(row=3, column=4, sticky='e', padx=15)
@@ -91,6 +96,7 @@ class CInterface :
         self.Btn_Recommencer = Button(self.Fenetre, text ='Nouvelle partie', width=15,command= lambda : [genererFenetreX() , creationEnnemie(self.Toile, 1)])
         self.Btn_Recommencer.grid(row=2, column=4, sticky='e', padx=15)
 
+    # création du menu
     def CreerMenu(self):
         menuBar = Menu(self.Fenetre )
         
@@ -100,17 +106,18 @@ class CInterface :
         menuFile.add_command(label="Difficulté" , command = genererFenetreDifficulte)
         menuFile.add_command(label="à propos" , command = genererFenetrePropos)
 
-        menuFile.add_separator()
+        menuFile.add_separator() #créé une séparation visuelle
 
         menuFile.add_command(label="Quitter", command= self.Fenetre.destroy)
         menuBar.add_cascade( label="Menu", menu=menuFile)
 
         self.Fenetre.config(menu = menuBar) 
 
+    # permet de fermer la fenetre principale permet d'être appelé hors de la classe et fermer l'objet "fenetre principale"
     def fermerFenetre(self):
         self.Fenetre.destroy()
 
-
+    #permet d'appeler mainloop hors de la class 
     def Mainloop(self):
         self.Fenetre.mainloop()
 
@@ -264,13 +271,14 @@ def Niveau(niveau):
         fenetre.ChangerImage("Data/StarWars5.png")
         return 35,1.5
 
-
+#créé la fenetre recommencer
 def genererFenetreRecommencer(defaite):
     fenetreRecommencer = Toplevel()
     fenetreRecommencer.overrideredirect(1)
     fenetreRecommencer.title("Recommencer")
     fenetreRecommencer.geometry("500x500+500+200")
-       
+
+    #condition d'affichage suivant le dénoument de la partie  
     if defaite == True :
         etatFinJeu = Label(fenetreRecommencer , text = 'DEFAITE' , font=("Courier", 40)  )   
     else:
@@ -279,12 +287,13 @@ def genererFenetreRecommencer(defaite):
     boutonQuitter = Button(fenetreRecommencer , text = "Quitter le jeu", command = fenetre.fermerFenetre)
     boutonRejouer = Button(fenetreRecommencer , text = "Recommencer", command = lambda : [creationEnnemie(fenetre.Toile,1), fenetreRecommencer.destroy()])
     boutonNiveau = Button(fenetreRecommencer , text = "Choix du niveau", command = lambda : [fenetreRecommencer.destroy(), genererFenetreDifficulte()])
+    #placement des widgets
     etatFinJeu.place(x = 115 , y = 110 )
     boutonRejouer.place(x = 50 , y = 350)
     boutonNiveau.place (x = 200 , y = 350)
     boutonQuitter.place(x = 350 , y = 350 , width = 100 )
 
-
+#créé la fenetre d'aide
 def genererFenetreAide():
     fenetreAide = Toplevel()
     fenetreAide.overrideredirect(1)
@@ -299,7 +308,7 @@ def genererFenetreAide():
     leBut = Label(fenetreAide , text ="Le but du jeu est de tuer tous les vaisseaux ennemies sans perdre toutes ses vies")
     bonJeu = Label(fenetreAide , text ="Amusez-vous bien" , font=("Courier", 15))
     boutonQuitter = Button(fenetreAide , text = "quitter", command = fenetreAide.destroy)
-    
+    #placement des widgets
     label1.place(x = 25 , y = 50)
     toucheX.place(x = 25 , y = 75 )
     toucheESP.place(x = 25 , y = 100)
@@ -310,26 +319,28 @@ def genererFenetreAide():
 
     boutonQuitter.place(x = 25 , y = 350 , width = 450)
 
+#créé la fenetre à propos
 def genererFenetrePropos():
-    fenetreAide = Toplevel()
-    fenetreAide.overrideredirect(1)
-    fenetreAide.title("à propos")
-    fenetreAide.geometry('500x270+500+200')
+    fenetrePropos = Toplevel()
+    fenetrePropos.overrideredirect(1)
+    fenetrePropos.title("à propos")
+    fenetrePropos.geometry('500x270+500+200')
 
-    label1 = Label(fenetreAide , text ="Qui sommes nous ? " , font=("Courier", 15))
-    toucheX = Label(fenetreAide , text ="Nous sommes deux étudiants de CPE Lyon nous avons réalisé ce jeu pour que les fans ")
-    toucheESP = Label(fenetreAide , text ="de star wars puissent enfin jouer au space invader")
+    label1 = Label(fenetrePropos , text ="Qui sommes nous ? " , font=("Courier", 15))
+    paragraphe1 = Label(fenetrePropos , text ="Nous sommes deux étudiants de CPE Lyon nous avons réalisé ce jeu pour que les fans ")
+    paragraphe2 = Label(fenetrePropos , text ="de star wars puissent enfin jouer au space invader")
     
-    label2 = Label(fenetreAide , text ="Le meilleur score réalisé est : " + lectureBestscore() , font=("Courier", 15))
-    boutonQuitter = Button(fenetreAide , text = "quitter", command = fenetreAide.destroy)
-    
-    
+    label2 = Label(fenetrePropos , text ="Le meilleur score réalisé est : " + lectureBestscore() , font=("Courier", 15))
+    boutonQuitter = Button(fenetrePropos , text = "quitter", command = fenetrePropos.destroy)
+    #placement des widgets
     label1.place(x = 25 , y = 50)
-    toucheX.place(x = 25 , y = 85 )
-    toucheESP.place(x = 25 , y = 100)
+    paragraphe1.place(x = 25 , y = 85 )
+    paragraphe2.place(x = 25 , y = 100)
     label2.place(x = 25 , y = 150 )
     boutonQuitter.place(x = 25 , y = 230 , width = 450)
 
+
+#création la fenetre d'information du début
 def genererFenetreX():
     fenetreAide = Toplevel()
     fenetreAide.overrideredirect(1)
@@ -340,10 +351,9 @@ def genererFenetreX():
     boutonQuitter = Button(fenetreAide , text = "quitter", command = fenetreAide.destroy)
     label1.place(x = 25 , y = 25)
     boutonQuitter.place(x=25 , y = 60 , width = 450)
-    
-    
 
 
+#création la fenetre d'information de difficulté
 def genererFenetreDifficulte():
     fenetreDifficulte = Toplevel()
     fenetreDifficulte.overrideredirect(1)
@@ -378,14 +388,12 @@ def VictoireDefaite(vie , condition):
             if Ye > 850 :
                 perdu = 1
         if vie == 0 or perdu == 1 :
-            print("Défaite")
             Reinitialisation()
             condition = 1
             vc.append(0)
             vc.append(condition)
             genererFenetreRecommencer(True)
-        elif listeEN == [] :
-            print("Victoire") 
+        elif listeEN == [] : 
             condition = 1
             Reinitialisation()
             vc.append(0)
@@ -472,7 +480,7 @@ def Partie(vie,score,condition):
 
 def Debut_Partie(event):
    
-    fenetre.Btn_Recommencer.config(state = DISABLED)
+    fenetre.Btn_Recommencer.config(state = DISABLED) #désactive le bouton nouvelle partie
     vie = 3
     condition = 0
     victoiredefaite = 1
@@ -481,17 +489,19 @@ def Debut_Partie(event):
    
     fenetre.Fenetre.after(10,lambda : Partie(vie,score,condition)) 
 
-
+#permet de lire le fichier texte score.txt et de retourner ce qu'il y a dedans
 def lectureBestscore():
-    fichier = open("score.txt",'r')  
+    fichier = open("score.txt",'r') #'r' = read 
     meilleurScore = fichier.read()
     fichier.close
     return meilleurScore 
 
+
+#permet de modifier le fichier texte score.txt
 def modifBestscore(ancien , nouveau):
     if nouveau > ancien:
         meilleurScore = str(nouveau) 
-        fichierScore = open("score.txt" , "w")
+        fichierScore = open("score.txt" , "w") #'w' = write 
         fichierScore.writelines(meilleurScore)
         fichierScore.close
 
@@ -499,13 +509,19 @@ def modifBestscore(ancien , nouveau):
 def Reinitialisation():
     for i in range(len(listeTir)):
         listeTir[i].Pcanvas.delete(listeTir[i].Pimage)
-    Amis.Pcanvas.delete(Amis.Pimage)                
+    Amis.Pcanvas.delete(Amis.Pimage)       
+
+
 ###################################################################################################################################################
 #                                                            Main
 ###################################################################################################################################################
-vie = 3
+#variable globale
+vie = 3 
 score = 0
+
+#instance de l'objet fenetre principale
 fenetre = CInterface(vie,score,'data/StarWars.png')
+# lance la partie lorsqu'on appuye sur x
 fenetre.Fenetre.bind('x',Debut_Partie)
 
 fenetre.Mainloop()
